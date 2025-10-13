@@ -1,0 +1,9 @@
+{
+    "extends": "./tsconfig.app.json",
+    "compilerOptions": {
+      "verbatimModuleSyntax": false,
+      "module": "CommonJS",
+      "types": ["vite/client", "node"],
+      "esModuleInterop": true
+    }
+}
