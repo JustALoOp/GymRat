@@ -12,6 +12,11 @@ const RegisterPage: React.FC = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (password.length < 6) {
+            setError('Password must be at least 6 characters long.');
+            return;
+        }
+        setError('');
         try {
             console.log('Submitting registration');
             const response = await axios.post('/api/v1/auth/register', { name, email, password });
