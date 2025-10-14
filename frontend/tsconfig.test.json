@@ -3,7 +3,7 @@
     "compilerOptions": {
       "verbatimModuleSyntax": false,
       "module": "CommonJS",
-      "types": ["vite/client", "node"],
+      "types": ["vite/client", "node", "jest"],
       "esModuleInterop": true
     }
 }
