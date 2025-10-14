@@ -50,4 +50,25 @@ UserSchema.methods.matchPassword = async function (enteredPassword) {
     return await bcrypt.compare(enteredPassword, this.password);
 };
 
+// Get token from model, create cookie and send response
+UserSchema.methods.sendTokenResponse = function (statusCode, res) {
+    // Create token
+    const token = this.getSignedJwtToken();
+
+    const options = {
+        expires: new Date(
+            Date.now() + 30 * 24 * 60 * 60 * 1000
+        ),
+        httpOnly: true,
+    };
+
+    if (process.env.NODE_ENV === 'production') {
+        options.secure = true;
+    }
+
+    res.status(statusCode)
+        .cookie('token', token, options)
+        .json({ success: true, token });
+};
+
 module.exports = mongoose.model('User', UserSchema);

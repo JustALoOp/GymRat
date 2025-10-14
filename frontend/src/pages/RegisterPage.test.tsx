@@ -21,8 +21,8 @@ describe('RegisterPage', () => {
         fireEvent.click(screen.getByRole('button', { name: /Register/i }));
 
         await waitFor(() => {
-            expect(mockedAxios.post).toHaveBeenCalledWith('/api/auth/register', {
-                username: 'testuser',
+            expect(mockedAxios.post).toHaveBeenCalledWith('/api/v1/auth/register', {
+                name: 'testuser',
                 email: 'test@example.com',
                 password: 'password',
             });

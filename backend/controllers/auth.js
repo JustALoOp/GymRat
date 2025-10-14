@@ -14,7 +14,7 @@ exports.register = async (req, res, next) => {
             password,
         });
 
-        sendTokenResponse(user, 200, res);
+        user.sendTokenResponse(200, res);
     } catch (err) {
         res.status(400).json({ success: false, error: err.message });
     }
@@ -46,29 +46,8 @@ exports.login = async (req, res, next) => {
             return res.status(401).json({ success: false, error: 'Invalid credentials' });
         }
 
-        sendTokenResponse(user, 200, res);
+        user.sendTokenResponse(200, res);
     } catch (err) {
         res.status(400).json({ success: false, error: err.message });
     }
-};
-
-// Get token from model, create cookie and send response
-const sendTokenResponse = (user, statusCode, res) => {
-    // Create token
-    const token = user.getSignedJwtToken();
-
-    const options = {
-        expires: new Date(
-            Date.now() + 30 * 24 * 60 * 60 * 1000
-        ),
-        httpOnly: true,
-    };
-
-    if (process.env.NODE_ENV === 'production') {
-        options.secure = true;
-    }
-
-    res.status(statusCode)
-        .cookie('token', token, options)
-        .json({ success: true, token });
 };

@@ -20,7 +20,7 @@ describe('LoginPage', () => {
         fireEvent.click(screen.getByRole('button', { name: /Login/i }));
 
         await waitFor(() => {
-            expect(mockedAxios.post).toHaveBeenCalledWith('/api/auth/login', {
+            expect(mockedAxios.post).toHaveBeenCalledWith('/api/v1/auth/login', {
                 email: 'test@example.com',
                 password: 'password',
             });
