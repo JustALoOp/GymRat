@@ -1,53 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import { TextField, Button, Box, Typography, Alert, Autocomplete } from '@mui/material';
+import React, { useState } from 'react';
+import { TextField, Button, Box, Typography, Alert } from '@mui/material';
 import { createWorkout } from '../api/workouts';
-import { getUniqueExercises } from '../api/stats';
 
 interface WorkoutFormProps {
     onWorkoutAdded: () => void;
 }
 
-interface ExerciseOption {
-    label: string;
-    _id: string;
-}
-
 const WorkoutForm: React.FC<WorkoutFormProps> = ({ onWorkoutAdded }) => {
-    const [exercise, setExercise] = useState<string | null>(null);
+    const [exercise, setExercise] = useState('');
     const [sets, setSets] = useState('');
     const [reps, setReps] = useState('');
     const [weight, setWeight] = useState('');
     const [error, setError] = useState<string | null>(null);
-    const [exerciseOptions, setExerciseOptions] = useState<ExerciseOption[]>([]);
-
-    useEffect(() => {
-        const fetchExercises = async () => {
-            const token = localStorage.getItem('token');
-            if (token) {
-                try {
-                    const uniqueExercises = await getUniqueExercises(token);
-                    const options = uniqueExercises.map((ex: { name: string; _id: string }) => ({
-                        label: ex.name,
-                        _id: ex._id,
-                    }));
-                    setExerciseOptions(options);
-                } catch (error) {
-                    console.error('Error fetching unique exercises:', error);
-                }
-            }
-        };
-
-        fetchExercises();
-    }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError(null);
-
-        if (!exercise) {
-            setError('Please select or enter an exercise.');
-            return;
-        }
 
         try {
             const token = localStorage.getItem('token');
@@ -64,7 +32,7 @@ const WorkoutForm: React.FC<WorkoutFormProps> = ({ onWorkoutAdded }) => {
             await createWorkout(workoutData, token);
             onWorkoutAdded(); // Callback to refresh the list
             // Reset form
-            setExercise(null);
+            setExercise('');
             setSets('');
             setReps('');
             setWeight('');
@@ -78,26 +46,14 @@ const WorkoutForm: React.FC<WorkoutFormProps> = ({ onWorkoutAdded }) => {
         <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
             <Typography variant="h6">Add New Workout</Typography>
             {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-            <Autocomplete
-                freeSolo
-                options={exerciseOptions.map((option) => option.label)}
+            <TextField
+                label="Exercise"
+                variant="outlined"
+                fullWidth
+                margin="normal"
                 value={exercise}
-                onChange={(_, newValue) => {
-                    setExercise(newValue);
-                }}
-                onInputChange={(_, newInputValue) => {
-                    setExercise(newInputValue);
-                }}
-                renderInput={(params) => (
-                    <TextField
-                        {...params}
-                        label="Exercise"
-                        variant="outlined"
-                        fullWidth
-                        margin="normal"
-                        required
-                    />
-                )}
+                onChange={(e) => setExercise(e.target.value)}
+                required
             />
             <TextField
                 label="Sets"

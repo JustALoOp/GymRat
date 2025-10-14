@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Typography, Container, Paper, Select, MenuItem, FormControl, InputLabel, SelectChangeEvent } from '@mui/material';
+import { Typography, Container, Paper, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
+import type { SelectChangeEvent } from '@mui/material';
 import VolumeChart from '../components/VolumeChart';
 import { getUniqueExercises } from '../api/stats';
 
