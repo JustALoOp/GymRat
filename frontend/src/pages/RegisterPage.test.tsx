@@ -15,7 +15,7 @@ describe('RegisterPage', () => {
             </BrowserRouter>
         );
 
-        fireEvent.change(screen.getByLabelText(/Username/i), { target: { value: 'testuser' } });
+        fireEvent.change(screen.getByLabelText(/Name/i), { target: { value: 'testuser' } });
         fireEvent.change(screen.getByLabelText(/Email Address/i), { target: { value: 'test@example.com' } });
         fireEvent.change(screen.getByLabelText(/Password/i), { target: { value: 'password' } });
         fireEvent.click(screen.getByRole('button', { name: /Register/i }));

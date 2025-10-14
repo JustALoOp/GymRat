@@ -4,7 +4,7 @@ import axios from 'axios';
 import { TextField, Button, Container, Typography, Box } from '@mui/material';
 
 const RegisterPage: React.FC = () => {
-    const [username, setUsername] = useState('');
+    const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -14,7 +14,7 @@ const RegisterPage: React.FC = () => {
         e.preventDefault();
         try {
             console.log('Submitting registration');
-            const response = await axios.post('/api/v1/auth/register', { name: username, email, password });
+            const response = await axios.post('/api/v1/auth/register', { name, email, password });
             console.log('Registration successful:', response.data);
             navigate('/login');
         } catch (err) {
@@ -41,13 +41,13 @@ const RegisterPage: React.FC = () => {
                         margin="normal"
                         required
                         fullWidth
-                        id="username"
-                        label="Username"
-                        name="username"
-                        autoComplete="username"
+                        id="name"
+                        label="Name"
+                        name="name"
+                        autoComplete="name"
                         autoFocus
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
                     />
                     <TextField
                         margin="normal"
