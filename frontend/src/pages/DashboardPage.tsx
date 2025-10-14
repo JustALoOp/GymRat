@@ -1,11 +1,46 @@
-import React from 'react';
-import { Typography, Container, Paper } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Typography, Container, Paper, Select, MenuItem, FormControl, InputLabel, SelectChangeEvent } from '@mui/material';
 import VolumeChart from '../components/VolumeChart';
+import { getUniqueExercises } from '../api/stats';
+
+interface Exercise {
+    _id: string;
+    name: string;
+}
 
 const DashboardPage: React.FC = () => {
     const token = localStorage.getItem('token');
-    // TODO: Implement a way for the user to select an exercise
-    const sampleExerciseId = '60d5f3f7e3b4a2345c68d777';
+    const [exercises, setExercises] = useState<Exercise[]>([]);
+    const [selectedExercise, setSelectedExercise] = useState<string>('');
+    const [selectedExerciseName, setSelectedExerciseName] = useState<string>('');
+
+    useEffect(() => {
+        const fetchExercises = async () => {
+            if (token) {
+                try {
+                    const uniqueExercises = await getUniqueExercises(token);
+                    setExercises(uniqueExercises);
+                    if (uniqueExercises.length > 0) {
+                        setSelectedExercise(uniqueExercises[0]._id);
+                        setSelectedExerciseName(uniqueExercises[0].name);
+                    }
+                } catch (error) {
+                    console.error('Error fetching unique exercises:', error);
+                }
+            }
+        };
+
+        fetchExercises();
+    }, [token]);
+
+    const handleExerciseChange = (event: SelectChangeEvent<string>) => {
+        const exerciseId = event.target.value;
+        setSelectedExercise(exerciseId);
+        const exercise = exercises.find(ex => ex._id === exerciseId);
+        if (exercise) {
+            setSelectedExerciseName(exercise.name);
+        }
+    };
 
     return (
         <Container>
@@ -13,13 +48,33 @@ const DashboardPage: React.FC = () => {
                 Welcome to your Dashboard
             </Typography>
             <Paper elevation={3} sx={{ p: 2, mt: 2 }}>
+                <FormControl fullWidth sx={{ mb: 2 }}>
+                    <InputLabel id="exercise-select-label">Select Exercise</InputLabel>
+                    <Select
+                        labelId="exercise-select-label"
+                        id="exercise-select"
+                        value={selectedExercise}
+                        label="Select Exercise"
+                        onChange={handleExerciseChange}
+                    >
+                        {exercises.map((exercise) => (
+                            <MenuItem key={exercise._id} value={exercise._id}>
+                                {exercise.name}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+
                 <Typography variant="h6" component="h2" gutterBottom>
-                    Volume History (Sample: Bench Press)
+                    Volume History for: {selectedExerciseName || '...'}
                 </Typography>
-                {token ? (
-                    <VolumeChart exerciseId={sampleExerciseId} token={token} />
+
+                {token && selectedExercise ? (
+                    <VolumeChart exerciseId={selectedExercise} token={token} />
                 ) : (
-                    <Typography>Please log in to see the chart.</Typography>
+                    <Typography>
+                        {token ? 'Select an exercise to see the chart.' : 'Please log in to see the chart.'}
+                    </Typography>
                 )}
             </Paper>
         </Container>

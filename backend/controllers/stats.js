@@ -50,3 +50,50 @@ exports.getVolumeHistory = async (req, res, next) => {
         res.status(400).json({ success: false, error: err.message });
     }
 };
+
+// @desc    Get unique exercises performed by the user
+// @route   GET /api/v1/stats/unique-exercises
+// @access  Private
+exports.getUniqueExercises = async (req, res, next) => {
+    try {
+        const uniqueExercises = await WorkoutSession.aggregate([
+            // Match sessions for the logged-in user
+            { $match: { user: new mongoose.Types.ObjectId(req.user.id) } },
+
+            // Unwind the exercises array to deconstruct the exercises array field from the input documents to output a document for each element
+            { $unwind: '$exercises' },
+
+            // Group by exercise ID to get unique exercises
+            { $group: { _id: '$exercises.exercise' } },
+
+            // Lookup exercise details from the 'exercises' collection
+            {
+                $lookup: {
+                    from: 'exercises', // The collection to join with
+                    localField: '_id', // Field from the input documents
+                    foreignField: '_id', // Field from the documents of the "from" collection
+                    as: 'exerciseDetails' // Output array field name
+                }
+            },
+
+            // Unwind the resulting array from the lookup
+            { $unwind: '$exerciseDetails' },
+
+            // Project to shape the output
+            {
+                $project: {
+                    _id: '$_id',
+                    name: '$exerciseDetails.name'
+                }
+            },
+
+            // Sort by name
+            { $sort: { name: 1 } }
+        ]);
+
+        res.status(200).json({ success: true, data: uniqueExercises });
+
+    } catch (err) {
+        res.status(400).json({ success: false, error: err.message });
+    }
+};
