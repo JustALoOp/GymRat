@@ -1,28 +1,41 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { TextField, Button, Container, Typography, Box } from '@mui/material';
+import { useNavigate, Link as RouterLink } from 'react-router-dom';
+import { login } from '../api/auth';
+import {
+    Container,
+    Box,
+    Typography,
+    TextField,
+    Button,
+    Alert,
+    CircularProgress,
+    Stack,
+} from '@mui/material';
 
 const LoginPage: React.FC = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
+    const [error, setError] = useState<string | null>(null);
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setError(null);
+        setLoading(true);
         try {
-            const response = await axios.post('/api/v1/auth/login', { email, password });
-            localStorage.setItem('token', response.data.token);
+            const data = await login({ email, password });
+            localStorage.setItem('token', data.token);
             navigate('/dashboard');
         } catch (err) {
-            setError('Failed to login. Please check your credentials.');
-            console.error(err);
+            setError('Invalid email or password. Please try again.');
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
-        <Container maxWidth="xs">
+        <Container component="main" maxWidth="xs">
             <Box
                 sx={{
                     marginTop: 8,
@@ -32,9 +45,9 @@ const LoginPage: React.FC = () => {
                 }}
             >
                 <Typography component="h1" variant="h5">
-                    Login
+                    Sign In
                 </Typography>
-                <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+                <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
                     <TextField
                         margin="normal"
                         required
@@ -46,6 +59,7 @@ const LoginPage: React.FC = () => {
                         autoFocus
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                        disabled={loading}
                     />
                     <TextField
                         margin="normal"
@@ -58,20 +72,29 @@ const LoginPage: React.FC = () => {
                         autoComplete="current-password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
+                        disabled={loading}
                     />
                     {error && (
-                        <Typography color="error" variant="body2">
+                        <Alert severity="error" sx={{ mt: 2 }}>
                             {error}
-                        </Typography>
+                        </Alert>
                     )}
                     <Button
                         type="submit"
                         fullWidth
                         variant="contained"
                         sx={{ mt: 3, mb: 2 }}
+                        disabled={loading}
                     >
-                        Login
+                        {loading ? <CircularProgress size={24} /> : 'Sign In'}
                     </Button>
+                    <Stack direction="row" justifyContent="flex-end">
+                        <RouterLink to="/register">
+                            <Typography variant="body2">
+                                {"Don't have an account? Sign Up"}
+                            </Typography>
+                        </RouterLink>
+                    </Stack>
                 </Box>
             </Box>
         </Container>

@@ -1,13 +1,23 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { TextField, Button, Container, Typography, Box } from '@mui/material';
+import { useNavigate, Link as RouterLink } from 'react-router-dom';
+import { register } from '../api/auth';
+import {
+    Container,
+    Box,
+    Typography,
+    TextField,
+    Button,
+    Alert,
+    CircularProgress,
+    Stack,
+} from '@mui/material';
 
 const RegisterPage: React.FC = () => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
+    const [error, setError] = useState<string | null>(null);
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -16,20 +26,20 @@ const RegisterPage: React.FC = () => {
             setError('Password must be at least 6 characters long.');
             return;
         }
-        setError('');
+        setError(null);
+        setLoading(true);
         try {
-            console.log('Submitting registration');
-            const response = await axios.post('/api/v1/auth/register', { name, email, password });
-            console.log('Registration successful:', response.data);
+            await register({ name, email, password });
             navigate('/login');
         } catch (err) {
-            setError('Failed to register. Please try again.');
-            console.error(err);
+            setError('Failed to register. An account with this email may already exist.');
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
-        <Container maxWidth="xs">
+        <Container component="main" maxWidth="xs">
             <Box
                 sx={{
                     marginTop: 8,
@@ -39,20 +49,21 @@ const RegisterPage: React.FC = () => {
                 }}
             >
                 <Typography component="h1" variant="h5">
-                    Register
+                    Sign Up
                 </Typography>
-                <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+                <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
                     <TextField
                         margin="normal"
                         required
                         fullWidth
                         id="name"
-                        label="Name"
+                        label="Full Name"
                         name="name"
                         autoComplete="name"
                         autoFocus
                         value={name}
                         onChange={(e) => setName(e.target.value)}
+                        disabled={loading}
                     />
                     <TextField
                         margin="normal"
@@ -64,6 +75,7 @@ const RegisterPage: React.FC = () => {
                         autoComplete="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                        disabled={loading}
                     />
                     <TextField
                         margin="normal"
@@ -73,23 +85,32 @@ const RegisterPage: React.FC = () => {
                         label="Password"
                         type="password"
                         id="password"
-                        autoComplete="current-password"
+                        autoComplete="new-password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
+                        disabled={loading}
                     />
                     {error && (
-                        <Typography color="error" variant="body2">
+                        <Alert severity="error" sx={{ mt: 2 }}>
                             {error}
-                        </Typography>
+                        </Alert>
                     )}
                     <Button
                         type="submit"
                         fullWidth
                         variant="contained"
                         sx={{ mt: 3, mb: 2 }}
+                        disabled={loading}
                     >
-                        Register
+                        {loading ? <CircularProgress size={24} /> : 'Sign Up'}
                     </Button>
+                    <Stack direction="row" justifyContent="flex-end">
+                        <RouterLink to="/login">
+                            <Typography variant="body2">
+                                Already have an account? Sign in
+                            </Typography>
+                        </RouterLink>
+                    </Stack>
                 </Box>
             </Box>
         </Container>

@@ -113,7 +113,7 @@ const WorkoutsPage: React.FC = () => {
     };
 
     return (
-        <Container>
+        <>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                 <Typography variant="h4" component="h1" gutterBottom>
                     Your Workouts
@@ -167,7 +167,7 @@ const WorkoutsPage: React.FC = () => {
                     </Button>
                 </DialogActions>
             </Dialog>
-        </Container>
+        </>
     );
 };
 

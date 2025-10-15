@@ -110,17 +110,17 @@ const DashboardPage: React.FC = () => {
     }, [workouts]);
 
     if (loading) {
-        return <Container sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}><CircularProgress /></Container>;
+        return <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}><CircularProgress /></Box>;
     }
 
     if (error) {
-        return <Container sx={{ mt: 4 }}><Alert severity="error">{error}</Alert></Container>;
+        return <Alert severity="error" sx={{ mt: 4 }}>{error}</Alert>;
     }
 
     return (
-        <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+        <>
             <Typography variant="h4" component="h1" gutterBottom>
-                Welcome to your Dashboard
+                Your Dashboard
             </Typography>
             <Grid container spacing={3}>
                 {/* Stat Cards */}
@@ -175,7 +175,7 @@ const DashboardPage: React.FC = () => {
                     </Paper>
                 </Grid>
             </Grid>
-        </Container>
+        </>
     );
 };
 
