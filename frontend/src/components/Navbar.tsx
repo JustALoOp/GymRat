@@ -1,6 +1,6 @@
 import React from 'react';
+import { AppBar, Toolbar, Typography, Button } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
-import { AppBar, Toolbar, Typography, Button, Box } from '@mui/material';
 
 const Navbar: React.FC = () => {
     const navigate = useNavigate();
@@ -20,7 +20,7 @@ const Navbar: React.FC = () => {
                     </Link>
                 </Typography>
                 {token ? (
-                    <Box>
+                    <>
                         <Button color="inherit" component={Link} to="/dashboard">
                             Dashboard
                         </Button>
@@ -30,16 +30,16 @@ const Navbar: React.FC = () => {
                         <Button color="inherit" onClick={handleLogout}>
                             Logout
                         </Button>
-                    </Box>
+                    </>
                 ) : (
-                    <Box>
+                    <>
                         <Button color="inherit" component={Link} to="/login">
                             Login
                         </Button>
                         <Button color="inherit" component={Link} to="/register">
                             Register
                         </Button>
-                    </Box>
+                    </>
                 )}
             </Toolbar>
         </AppBar>
