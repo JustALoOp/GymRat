@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import {
     Typography, CircularProgress, Alert, Box, Grid, Card, CardContent, Snackbar, CardActions, Button, Divider
 } from '@mui/material';
@@ -45,7 +45,7 @@ const SessionCard: React.FC<{ session: IWorkoutSession }> = ({ session }) => {
                 </Box>
             </CardContent>
             <CardActions>
-                <Button size="small">View Details</Button>
+                <Button component={Link} to={`/workouts/${session._id}`} size="small">View Details</Button>
             </CardActions>
         </Card>
     );

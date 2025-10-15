@@ -9,6 +9,7 @@ import WorkoutPlanDetailsPage from './pages/WorkoutPlanDetailsPage';
 import ActiveWorkoutPage from './pages/ActiveWorkoutPage';
 import StatsPage from './pages/StatsPage';
 import ExercisesPage from './pages/ExercisesPage';
+import WorkoutSessionDetailsPage from './pages/WorkoutSessionDetailsPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
 
@@ -25,6 +26,16 @@ function App() {
                         <ProtectedRoute>
                             <Layout>
                                 <DashboardPage />
+                            </Layout>
+                        </ProtectedRoute>
+                    }
+                />
+                 <Route
+                    path="/workouts/:id"
+                    element={
+                        <ProtectedRoute>
+                            <Layout>
+                                <WorkoutSessionDetailsPage />
                             </Layout>
                         </ProtectedRoute>
                     }

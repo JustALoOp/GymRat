@@ -19,3 +19,13 @@ export const createWorkoutSession = async (sessionData: WorkoutSessionInput): Pr
     const response = await apiClient.post('/workoutsessions', sessionData);
     return response.data.data;
 };
+
+/**
+ * Fetches a single workout session by its ID.
+ * @param id - The ID of the workout session.
+ * @returns The workout session.
+ */
+export const getWorkoutSession = async (id: string): Promise<IWorkoutSession> => {
+    const response = await apiClient.get(`/workoutsessions/${id}`);
+    return response.data.data;
+};
