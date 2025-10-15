@@ -8,6 +8,7 @@ import WorkoutPlansPage from './pages/WorkoutPlansPage';
 import WorkoutPlanDetailsPage from './pages/WorkoutPlanDetailsPage';
 import ActiveWorkoutPage from './pages/ActiveWorkoutPage';
 import StatsPage from './pages/StatsPage';
+import ExercisesPage from './pages/ExercisesPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
 
@@ -74,6 +75,16 @@ function App() {
                         <ProtectedRoute>
                             <Layout>
                                 <StatsPage />
+                            </Layout>
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/exercises"
+                    element={
+                        <ProtectedRoute>
+                            <Layout>
+                                <ExercisesPage />
                             </Layout>
                         </ProtectedRoute>
                     }

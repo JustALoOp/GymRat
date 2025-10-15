@@ -1,17 +1,56 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import {
-    Typography,
-    CircularProgress,
-    Alert,
-    Box,
-    Grid,
-    Card,
-    CardContent,
-    Snackbar,
+    Typography, CircularProgress, Alert, Box, Grid, Card, CardContent, Snackbar, CardActions, Button, Divider
 } from '@mui/material';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
+import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
 import { getWorkoutSessions } from '../api/workouts';
 import type { IWorkoutSession } from '../types/workoutSession';
+
+const SessionCard: React.FC<{ session: IWorkoutSession }> = ({ session }) => {
+    const totalVolume = useMemo(() =>
+        session.performedExercises.reduce((acc, pEx) =>
+            acc + pEx.sets.reduce((setAcc, set) => setAcc + set.weight * set.reps, 0), 0),
+        [session.performedExercises]
+    );
+
+    return (
+        <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+            <CardContent sx={{ flexGrow: 1 }}>
+                <Typography variant="h6" component="h2" gutterBottom>
+                    {session.workoutPlan?.name || 'Workout Session'}
+                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', color: 'text.secondary', mb: 2 }}>
+                    <CalendarTodayIcon fontSize="small" sx={{ mr: 1 }} />
+                    <Typography variant="body2">
+                        {new Date(session.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                    </Typography>
+                </Box>
+                <Divider sx={{ my: 1 }} />
+                <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
+                    <LocalFireDepartmentIcon fontSize="small" sx={{ mr: 1, color: 'warning.main' }} />
+                    <Typography variant="body2" component="span" sx={{ fontWeight: 'bold' }}>
+                        {totalVolume.toLocaleString()} kg
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ ml: 0.5 }}>- Total Volume</Typography>
+                </Box>
+                <Box sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
+                    <FitnessCenterIcon fontSize="small" sx={{ mr: 1, color: 'info.main' }} />
+                    <Typography variant="body2" component="span" sx={{ fontWeight: 'bold' }}>
+                        {session.performedExercises.length}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ ml: 0.5 }}>- Exercise(s) Completed</Typography>
+                </Box>
+            </CardContent>
+            <CardActions>
+                <Button size="small">View Details</Button>
+            </CardActions>
+        </Card>
+    );
+};
+
 
 const WorkoutsPage: React.FC = () => {
     const [sessions, setSessions] = useState<IWorkoutSession[]>([]);
@@ -23,69 +62,44 @@ const WorkoutsPage: React.FC = () => {
     useEffect(() => {
         if (location.state?.message) {
             setSnackbar({ open: true, message: location.state.message });
-            // Clear the state so the message doesn't reappear on refresh
-            window.history.replaceState({}, document.title)
+            window.history.replaceState({}, document.title);
         }
     }, [location]);
 
-    const fetchWorkoutSessions = useCallback(async () => {
-        try {
-            setLoading(true);
-            const data = await getWorkoutSessions();
-            setSessions(data.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())); // Sort by most recent
-        } catch (err) {
-            setError('Failed to fetch workout sessions.');
-            console.error(err);
-        } finally {
-            setLoading(false);
-        }
+    useEffect(() => {
+        const fetchWorkoutSessions = async () => {
+            try {
+                setLoading(true);
+                const data = await getWorkoutSessions();
+                setSessions(data.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
+            } catch (err) {
+                setError('Failed to fetch workout sessions.');
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchWorkoutSessions();
     }, []);
 
-    useEffect(() => {
-        fetchWorkoutSessions();
-    }, [fetchWorkoutSessions]);
-
-    const handleCloseSnackbar = () => {
-        setSnackbar({ ...snackbar, open: false });
-    };
+    const handleCloseSnackbar = () => setSnackbar({ ...snackbar, open: false });
 
     return (
         <Box>
-            <Typography variant="h4" component="h1" gutterBottom>
-                Workout History
-            </Typography>
+            {loading && <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}><CircularProgress /></Box>}
+            {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
 
-            {loading ? (
-                <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
-                    <CircularProgress />
+            {!loading && !error && sessions.length === 0 && (
+                <Box sx={{ textAlign: 'center', mt: 4 }}>
+                    <Typography variant="h6">No workout history found.</Typography>
+                    <Typography color="text.secondary">Complete a session to see it here!</Typography>
                 </Box>
-            ) : error ? (
-                <Alert severity="error" sx={{ mt: 2 }}>
-                    {error}
-                </Alert>
-            ) : sessions.length === 0 ? (
-                <Typography sx={{ mt: 3 }}>
-                    You haven't completed any workouts yet. Go start one!
-                </Typography>
-            ) : (
-                <Grid container spacing={3} sx={{ mt: 1 }}>
+            )}
+
+            {!loading && sessions.length > 0 && (
+                <Grid container spacing={3}>
                     {sessions.map((session) => (
-                        <Grid item xs={12} md={6} lg={4} key={session._id}>
-                            <Card>
-                                <CardContent>
-                                    <Typography variant="h6">
-                                        {session.workoutPlan?.name || 'Workout Session'}
-                                    </Typography>
-                                    <Typography color="text.secondary" sx={{ mb: 1.5 }}>
-                                        {new Date(session.date).toLocaleDateString('en-US', {
-                                            year: 'numeric', month: 'long', day: 'numeric'
-                                        })}
-                                    </Typography>
-                                    <Typography variant="body2">
-                                        {session.performedExercises.length} exercise(s) completed.
-                                    </Typography>
-                                </CardContent>
-                            </Card>
+                        <Grid item xs={12} sm={6} md={4} key={session._id}>
+                            <SessionCard session={session} />
                         </Grid>
                     ))}
                 </Grid>
@@ -95,9 +109,12 @@ const WorkoutsPage: React.FC = () => {
                 open={snackbar.open}
                 autoHideDuration={6000}
                 onClose={handleCloseSnackbar}
-                message={snackbar.message}
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-            />
+            >
+                 <Alert onClose={handleCloseSnackbar} severity="success" sx={{ width: '100%' }}>
+                    {snackbar.message}
+                </Alert>
+            </Snackbar>
         </Box>
     );
 };

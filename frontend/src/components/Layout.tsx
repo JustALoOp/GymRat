@@ -9,6 +9,7 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
 import EventNoteIcon from '@mui/icons-material/EventNote';
 import BarChartIcon from '@mui/icons-material/BarChart';
+import ListAltIcon from '@mui/icons-material/ListAlt';
 import LogoutIcon from '@mui/icons-material/Logout';
 
 const drawerWidth = 240;
@@ -21,6 +22,7 @@ const navItems = [
     { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
     { text: 'Workouts', icon: <FitnessCenterIcon />, path: '/workouts' },
     { text: 'Workout Plans', icon: <EventNoteIcon />, path: '/workout-plans' },
+    { text: 'Exercises', icon: <ListAltIcon />, path: '/exercises' },
     { text: 'Statistics', icon: <BarChartIcon />, path: '/stats' },
 ];
 

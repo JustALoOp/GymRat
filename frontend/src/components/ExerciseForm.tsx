@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { TextField, Button, Box } from '@mui/material';
+import { TextField, Button, Box, Stack, Alert, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import type { Exercise } from '../types/exercise';
-import { createExercise, updateExercise } from '../api/exercises';
-import type { ExerciseInput } from '../api/exercises';
+import { createExercise, updateExercise, ExerciseInput } from '../api/exercises';
+
+const muscleGroupOptions = ["Chest", "Back", "Legs", "Shoulders", "Biceps", "Triceps", "Abs", "Other"];
 
 interface ExerciseFormProps {
     onSuccess: (message: string) => void;
@@ -12,14 +13,16 @@ interface ExerciseFormProps {
 
 const ExerciseForm: React.FC<ExerciseFormProps> = ({ onSuccess, onCancel, exerciseToEdit }) => {
     const [name, setName] = useState('');
+    const [muscleGroup, setMuscleGroup] = useState('');
     const [error, setError] = useState<string | null>(null);
-    const token = localStorage.getItem('token');
 
     useEffect(() => {
         if (exerciseToEdit) {
             setName(exerciseToEdit.name);
+            setMuscleGroup(exerciseToEdit.muscleGroup);
         } else {
             setName('');
+            setMuscleGroup('');
         }
     }, [exerciseToEdit]);
 
@@ -27,55 +30,56 @@ const ExerciseForm: React.FC<ExerciseFormProps> = ({ onSuccess, onCancel, exerci
         e.preventDefault();
         setError(null);
 
-        if (!name.trim()) {
-            setError('Exercise name is required.');
+        if (!name.trim() || !muscleGroup) {
+            setError('All fields are required.');
             return;
         }
 
-        if (!token) {
-            setError('Authentication token not found. Please log in.');
-            return;
-        }
-
-        const exerciseData: ExerciseInput = { name };
+        const exerciseData: ExerciseInput = { name, muscleGroup };
 
         try {
             if (exerciseToEdit) {
-                await updateExercise(exerciseToEdit._id, exerciseData, token);
+                await updateExercise(exerciseToEdit._id, exerciseData);
                 onSuccess('Exercise updated successfully!');
             } else {
-                await createExercise(exerciseData, token);
+                await createExercise(exerciseData);
                 onSuccess('Exercise created successfully!');
             }
         } catch (err) {
             setError('Failed to save the exercise. Please try again.');
-            console.error(err);
         }
     };
 
     return (
-        <form onSubmit={handleSubmit}>
-            <Box display="flex" flexDirection="column" gap={2}>
+        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
+            <Stack spacing={3}>
+                {error && <Alert severity="error">{error}</Alert>}
                 <TextField
                     label="Exercise Name"
                     variant="outlined"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    error={!!error}
-                    helperText={error}
                     fullWidth
                     required
                 />
-                <Box display="flex" justifyContent="flex-end" gap={1}>
-                    <Button onClick={onCancel} color="secondary">
-                        Cancel
-                    </Button>
-                    <Button type="submit" variant="contained" color="primary">
-                        {exerciseToEdit ? 'Update' : 'Create'}
+                <FormControl fullWidth required>
+                    <InputLabel>Muscle Group</InputLabel>
+                    <Select
+                        value={muscleGroup}
+                        label="Muscle Group"
+                        onChange={(e) => setMuscleGroup(e.target.value)}
+                    >
+                        {muscleGroupOptions.map(group => <MenuItem key={group} value={group}>{group}</MenuItem>)}
+                    </Select>
+                </FormControl>
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, pt: 2 }}>
+                    <Button onClick={onCancel} color="inherit">Cancel</Button>
+                    <Button type="submit" variant="contained">
+                        {exerciseToEdit ? 'Update Exercise' : 'Create Exercise'}
                     </Button>
                 </Box>
-            </Box>
-        </form>
+            </Stack>
+        </Box>
     );
 };
 
