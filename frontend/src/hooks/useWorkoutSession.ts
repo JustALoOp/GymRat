@@ -9,8 +9,8 @@ export const useWorkoutSession = () => {
         if (!token) {
             throw new Error("Authentication token not found.");
         }
-        return await apiCreateWorkoutSession(sessionData, token);
-    }, [token]);
+        return await apiCreateWorkoutSession(sessionData);
+    }, []);
 
     return { createWorkoutSession };
 };

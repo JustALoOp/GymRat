@@ -28,10 +28,10 @@
     "hpp": "^0.2.3",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.19.1",
-    "xss-clean": "^0.1.4"
+    "xss-clean": "^0.1.4",
+    "dotenv": "^17.2.3"
   },
   "devDependencies": {
-    "dotenv": "^17.2.3",
     "jest": "^29.7.0",
     "mongodb-memory-server": "^9.4.0",
     "nodemon": "^3.1.10",
