@@ -1,6 +1,15 @@
 import React from 'react';
-import { Typography, Paper, List, ListItem, ListItemText, IconButton } from '@mui/material';
+import {
+    Typography,
+    Grid,
+    Card,
+    CardContent,
+    CardActions,
+    IconButton,
+    Box,
+} from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 
 interface Workout {
     _id: string;
@@ -14,34 +23,46 @@ interface Workout {
 interface WorkoutListProps {
     workouts: Workout[];
     onDelete: (id: string) => void;
+    onEdit: (workout: Workout) => void;
 }
 
-const WorkoutList: React.FC<WorkoutListProps> = ({ workouts, onDelete }) => {
+const WorkoutList: React.FC<WorkoutListProps> = ({ workouts, onDelete, onEdit }) => {
     return (
-        <Paper elevation={3} sx={{ p: 2, mt: 3 }}>
+        <Box sx={{ mt: 3 }}>
             {workouts.length === 0 ? (
                 <Typography variant="body1">No workouts found. Add your first workout!</Typography>
             ) : (
-                <List>
+                <Grid container spacing={3}>
                     {workouts.map((workout) => (
-                        <ListItem
-                            key={workout._id}
-                            divider
-                            secondaryAction={
-                                <IconButton edge="end" aria-label="delete" onClick={() => onDelete(workout._id)}>
-                                    <DeleteIcon />
-                                </IconButton>
-                            }
-                        >
-                            <ListItemText
-                                primary={workout.exercise}
-                                secondary={`Sets: ${workout.sets}, Reps: ${workout.reps}, Weight: ${workout.weight} kg`}
-                            />
-                        </ListItem>
+                        <Grid item xs={12} sm={6} md={4} key={workout._id}>
+                            <Card elevation={3}>
+                                <CardContent>
+                                    <Typography variant="h5" component="div">
+                                        {workout.exercise}
+                                    </Typography>
+                                    <Typography sx={{ mb: 1.5 }} color="text.secondary">
+                                        {new Date(workout.createdAt).toLocaleDateString()}
+                                    </Typography>
+                                    <Typography variant="body2">
+                                        Sets: {workout.sets} <br />
+                                        Reps: {workout.reps} <br />
+                                        Weight: {workout.weight} kg
+                                    </Typography>
+                                </CardContent>
+                                <CardActions>
+                                    <IconButton aria-label="edit" onClick={() => onEdit(workout)}>
+                                        <EditIcon />
+                                    </IconButton>
+                                    <IconButton aria-label="delete" onClick={() => onDelete(workout._id)}>
+                                        <DeleteIcon />
+                                    </IconButton>
+                                </CardActions>
+                            </Card>
+                        </Grid>
                     ))}
-                </List>
+                </Grid>
             )}
-        </Paper>
+        </Box>
     );
 };
 

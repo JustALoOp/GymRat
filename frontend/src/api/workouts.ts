@@ -41,3 +41,14 @@ export const deleteWorkout = async (id: string, token: string) => {
     const response = await axios.delete(`${API_URL}/${id}`, config);
     return response.data.data;
 };
+
+// Aktualizacja treningu
+export const updateWorkout = async (id: string, workoutData: Partial<WorkoutData>, token: string) => {
+    const config = {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    };
+    const response = await axios.put(`${API_URL}/${id}`, workoutData, config);
+    return response.data.data;
+};
