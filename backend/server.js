@@ -19,12 +19,28 @@ app.use(express.json());
 // Enable CORS
 app.use(cors());
 
+const helmet = require('helmet');
+const xss = require('xss-clean');
+const hpp = require('hpp');
+const errorHandler = require('./middleware/error');
+
 // Mount routers
 app.use('/api/v1/auth', require('./routes/auth'));
 app.use('/api/v1/exercises', require('./routes/exercises'));
 app.use('/api/v1/workoutplans', require('./routes/workoutPlans'));
 app.use('/api/v1/workoutsessions', require('./routes/workoutSessions'));
 app.use('/api/v1/stats', require('./routes/stats'));
+
+// Helmet
+app.use(helmet());
+
+// Prevent XSS attacks
+app.use(xss());
+
+// Prevent http param pollution
+app.use(hpp());
+
+app.use(errorHandler);
 
 app.get('/', (req, res) => {
     res.send('API is running...');
