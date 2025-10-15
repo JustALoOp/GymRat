@@ -1,21 +1,11 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
-    Typography,
-    Box,
-    CircularProgress,
-    Paper,
-    Alert,
-    Button,
-    Divider,
-    TextField,
-    Checkbox,
-    FormControlLabel,
-    Accordion,
-    AccordionSummary,
-    AccordionDetails,
+    Typography, Box, CircularProgress, Paper, Alert, Button, Stepper, Step, StepLabel,
+    Card, CardContent, TextField, IconButton, List, ListItem, ListItemText
 } from '@mui/material';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import { getWorkoutPlan } from '../api/workoutPlans';
 import { useWorkoutSession } from '../hooks/useWorkoutSession';
 import type { IWorkoutPlan, IWorkoutPlanExercise } from '../types/workoutPlan';
@@ -40,59 +30,57 @@ const ActiveWorkoutPage: React.FC = () => {
     const [trackedExercises, setTrackedExercises] = useState<TrackedExercise[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const token = localStorage.getItem('token');
+    const [activeStep, setActiveStep] = useState(0);
 
-    const initializeTracker = (plan: IWorkoutPlan) => {
-        const initialTracker: TrackedExercise[] = plan.exercises.map((ex: IWorkoutPlanExercise) => ({
-            exerciseId: ex.exercise._id,
-            name: ex.exercise.name,
-            sets: Array.from({ length: ex.sets }, () => ({
-                weight: '',
-                reps: ex.reps.toString(), // pre-fill reps from plan
-                completed: false,
-            })),
-        }));
-        setTrackedExercises(initialTracker);
-    };
+    const { createWorkoutSession, loading: isSaving } = useWorkoutSession();
 
     useEffect(() => {
-        if (!planId || !token) {
-            setError('Plan ID or authentication token is missing.');
+        if (!planId) {
+            setError('Plan ID is missing.');
             setIsLoading(false);
             return;
         }
-
         const fetchWorkoutPlan = async () => {
             try {
-                const plan = await getWorkoutPlan(planId, token);
+                const plan = await getWorkoutPlan(planId);
                 setWorkoutPlan(plan);
-                initializeTracker(plan);
+                const initialTracker: TrackedExercise[] = plan.exercises.map((ex: IWorkoutPlanExercise) => ({
+                    exerciseId: ex.exercise._id,
+                    name: ex.exercise.name,
+                    sets: Array.from({ length: ex.sets }, () => ({
+                        weight: '',
+                        reps: ex.reps.toString(),
+                        completed: false,
+                    })),
+                }));
+                setTrackedExercises(initialTracker);
             } catch (err) {
                 setError('Failed to fetch workout plan details.');
             } finally {
                 setIsLoading(false);
             }
         };
-
         fetchWorkoutPlan();
-    }, [planId, token]);
+    }, [planId]);
 
-    const handleSetChange = (exerciseIndex: number, setIndex: number, field: keyof TrackedSet, value: any) => {
+    const handleSetChange = (setIndex: number, field: keyof TrackedSet, value: any) => {
         const newTrackedExercises = [...trackedExercises];
-        (newTrackedExercises[exerciseIndex].sets[setIndex] as any)[field] = value;
+        const currentExercise = newTrackedExercises[activeStep];
+        (currentExercise.sets[setIndex] as any)[field] = value;
         setTrackedExercises(newTrackedExercises);
     };
 
-    const allSetsCompleted = useMemo(() =>
-        trackedExercises.every(ex => ex.sets.every(s => s.completed)),
-        [trackedExercises]
-    );
+    const toggleSetCompletion = (setIndex: number) => {
+        const currentExercise = trackedExercises[activeStep];
+        const isCompleted = !currentExercise.sets[setIndex].completed;
+        handleSetChange(setIndex, 'completed', isCompleted);
+    };
 
-    const { createWorkoutSession } = useWorkoutSession(); // Custom hook for API calls
+    const handleNext = () => setActiveStep((prev) => Math.min(prev + 1, trackedExercises.length));
+    const handleBack = () => setActiveStep((prev) => Math.max(prev - 1, 0));
 
     const handleFinishWorkout = async () => {
         if (!workoutPlan) return;
-
         const sessionData: WorkoutSessionInput = {
             workoutPlan: workoutPlan._id,
             performedExercises: trackedExercises.map(ex => ({
@@ -104,76 +92,65 @@ const ActiveWorkoutPage: React.FC = () => {
                 })),
             })),
         };
-
         try {
             await createWorkoutSession(sessionData);
-            navigate('/workouts', { state: { message: 'Workout session saved successfully!' } });
-        } catch (error) {
-            console.error("Failed to save workout session", error);
-            // Here you could set an error state and display a snackbar
+            navigate('/workouts', { state: { message: 'Workout session saved!' } });
+        } catch (err) {
+            setError('Failed to save workout session.');
         }
     };
 
-    if (isLoading) return <CircularProgress />;
+    if (isLoading) return <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}><CircularProgress /></Box>;
     if (error) return <Alert severity="error">{error}</Alert>;
-    if (!workoutPlan) return <Typography>Workout plan not found.</Typography>;
+    if (!workoutPlan || trackedExercises.length === 0) return <Typography>Workout plan not found or is empty.</Typography>;
+
+    const currentExercise = trackedExercises[activeStep];
 
     return (
-        <Paper sx={{ p: 3 }}>
-            <Typography variant="h4" gutterBottom>
-                {workoutPlan.name}
-            </Typography>
-            <Divider sx={{ my: 2 }} />
+        <Paper sx={{ p: { xs: 2, sm: 3 }, maxWidth: 800, margin: 'auto' }}>
+            <Typography variant="h4" gutterBottom align="center">{workoutPlan.name}</Typography>
+            <Stepper activeStep={activeStep} alternativeLabel sx={{ mb: 4 }}>
+                {trackedExercises.map((ex) => (
+                    <Step key={ex.exerciseId}><StepLabel>{ex.name}</StepLabel></Step>
+                ))}
+            </Stepper>
 
-            {trackedExercises.map((trackedEx, exerciseIndex) => (
-                <Accordion key={trackedEx.exerciseId} defaultExpanded>
-                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                        <Typography variant="h6">{trackedEx.name}</Typography>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                        <Box>
-                            {trackedEx.sets.map((set, setIndex) => (
-                                <Box key={setIndex} sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                                    <Typography sx={{ minWidth: '50px' }}>Set {setIndex + 1}</Typography>
-                                    <TextField
-                                        label="Weight (kg)"
-                                        variant="outlined"
-                                        size="small"
-                                        value={set.weight}
-                                        onChange={(e) => handleSetChange(exerciseIndex, setIndex, 'weight', e.target.value)}
-                                    />
-                                    <TextField
-                                        label="Reps"
-                                        variant="outlined"
-                                        size="small"
-                                        value={set.reps}
-                                        onChange={(e) => handleSetChange(exerciseIndex, setIndex, 'reps', e.target.value)}
-                                    />
-                                    <FormControlLabel
-                                        control={
-                                            <Checkbox
-                                                checked={set.completed}
-                                                onChange={(e) => handleSetChange(exerciseIndex, setIndex, 'completed', e.target.checked)}
-                                            />
-                                        }
-                                        label="Done"
-                                    />
-                                </Box>
+            {activeStep < trackedExercises.length ? (
+                <Card>
+                    <CardContent>
+                        <Typography variant="h5" component="h2" gutterBottom>{currentExercise.name}</Typography>
+                        <List>
+                            {currentExercise.sets.map((set, setIndex) => (
+                                <ListItem key={setIndex} divider>
+                                    <ListItemText primary={`Set ${setIndex + 1}`} />
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                        <TextField label="Weight (kg)" variant="outlined" size="small" value={set.weight} onChange={(e) => handleSetChange(setIndex, 'weight', e.target.value)} sx={{ width: '100px' }} />
+                                        <TextField label="Reps" variant="outlined" size="small" value={set.reps} onChange={(e) => handleSetChange(setIndex, 'reps', e.target.value)} sx={{ width: '100px' }} />
+                                        <IconButton color={set.completed ? 'success' : 'default'} onClick={() => toggleSetCompletion(setIndex)}>
+                                            {set.completed ? <CheckCircleIcon /> : <RadioButtonUncheckedIcon />}
+                                        </IconButton>
+                                    </Box>
+                                </ListItem>
                             ))}
-                        </Box>
-                    </AccordionDetails>
-                </Accordion>
-            ))}
+                        </List>
+                    </CardContent>
+                </Card>
+            ) : (
+                <Box sx={{ textAlign: 'center', my: 4 }}>
+                    <Typography variant="h5">Workout Complete!</Typography>
+                    <Typography color="text.secondary">Ready to save your session?</Typography>
+                </Box>
+            )}
 
-            <Box mt={3}>
-                <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={handleFinishWorkout}
-                    disabled={!allSetsCompleted}
-                >
-                    Finish Workout
-                </Button>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3 }}>
+                <Button disabled={activeStep === 0} onClick={handleBack}>Back</Button>
+                {activeStep < trackedExercises.length - 1 ? (
+                    <Button variant="contained" onClick={handleNext}>Next Exercise</Button>
+                ) : (
+                    <Button variant="contained" color="primary" onClick={handleFinishWorkout} disabled={isSaving}>
+                        {isSaving ? <CircularProgress size={24}/> : 'Finish & Save Workout'}
+                    </Button>
+                )}
             </Box>
         </Paper>
     );

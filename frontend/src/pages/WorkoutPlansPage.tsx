@@ -17,15 +17,9 @@ const WorkoutPlansPage: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [isFormOpen, setFormOpen] = useState(false);
     const [snackbar, setSnackbar] = useState<{ open: boolean, message: string, severity: 'success' | 'error' }>({ open: false, message: '', severity: 'success' });
-    const token = localStorage.getItem('token');
     const navigate = useNavigate();
 
     const fetchWorkoutPlans = useCallback(async () => {
-        if (!token) {
-            setError('Authentication token not found.');
-            setIsLoading(false);
-            return;
-        }
         try {
             setIsLoading(true);
             const plans = await getWorkoutPlans();

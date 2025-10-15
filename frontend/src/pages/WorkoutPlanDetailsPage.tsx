@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Typography, Box, CircularProgress, Paper, Alert, Button, Divider } from '@mui/material';
+import {
+    Typography, Box, CircularProgress, Paper, Alert, Button, Divider, List, ListItem,
+    ListItemText, ListItemAvatar, Avatar, IconButton, Fab
+} from '@mui/material';
+import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import AddIcon from '@mui/icons-material/Add';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import { getWorkoutPlan, deleteWorkoutPlan } from '../api/workoutPlans';
 import type { IWorkoutPlan } from '../types/workoutPlan';
 
@@ -10,18 +18,17 @@ const WorkoutPlanDetailsPage: React.FC = () => {
     const [workoutPlan, setWorkoutPlan] = useState<IWorkoutPlan | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const token = localStorage.getItem('token');
 
     useEffect(() => {
-        if (!id || !token) {
-            setError('Plan ID or authentication token is missing.');
+        if (!id) {
+            setError('Plan ID is missing.');
             setIsLoading(false);
             return;
         }
 
         const fetchWorkoutPlan = async () => {
             try {
-                const plan = await getWorkoutPlan(id, token);
+                const plan = await getWorkoutPlan(id);
                 setWorkoutPlan(plan);
             } catch (err) {
                 setError('Failed to fetch workout plan details.');
@@ -31,17 +38,17 @@ const WorkoutPlanDetailsPage: React.FC = () => {
         };
 
         fetchWorkoutPlan();
-    }, [id, token]);
+    }, [id]);
 
     const handleDelete = async () => {
-        if (!id || !token) {
-            setError('Plan ID or authentication token is missing.');
+        if (!id) {
+            setError('Plan ID is missing.');
             return;
         }
 
         if (window.confirm('Are you sure you want to delete this workout plan?')) {
             try {
-                await deleteWorkoutPlan(id, token);
+                await deleteWorkoutPlan(id);
                 navigate('/workout-plans');
             } catch (err) {
                 setError('Failed to delete workout plan.');
@@ -50,7 +57,7 @@ const WorkoutPlanDetailsPage: React.FC = () => {
     };
 
     if (isLoading) {
-        return <CircularProgress />;
+        return <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}><CircularProgress /></Box>;
     }
 
     if (error) {
@@ -62,39 +69,77 @@ const WorkoutPlanDetailsPage: React.FC = () => {
     }
 
     return (
-        <Paper sx={{ p: 3 }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                <Typography variant="h4">{workoutPlan.name}</Typography>
-                <Box>
-                    <Button
-                        variant="contained"
-                        color="success"
-                        sx={{ mr: 1 }}
-                        onClick={() => navigate(`/workouts/active/${workoutPlan._id}`)}
-                    >
-                        Start Workout
-                    </Button>
-                    <Button variant="outlined" color="primary" sx={{ mr: 1 }}>
-                        Edit
-                    </Button>
-                    <Button variant="outlined" color="error" onClick={handleDelete}>
-                        Delete
+        <Paper sx={{ p: { xs: 2, sm: 3, md: 4 } }}>
+            <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                <Box sx={{ mb: { xs: 2, sm: 0 } }}>
+                    <Typography variant="h4" component="h1" gutterBottom>{workoutPlan.name}</Typography>
+                    {workoutPlan.description && <Typography variant="body1" color="text.secondary">{workoutPlan.description}</Typography>}
+                </Box>
+                <Box sx={{ display: 'flex', gap: 1, flexShrink: 0 }}>
+                    <Button variant="outlined" color="error" onClick={handleDelete} startIcon={<DeleteIcon />}>
+                        Delete Plan
                     </Button>
                 </Box>
             </Box>
-            <Divider sx={{ mb: 2 }} />
-            {workoutPlan.description && <Typography variant="body1" sx={{ mb: 3 }}>{workoutPlan.description}</Typography>}
+            <Divider sx={{ my: 3 }} />
 
-            <Typography variant="h5" sx={{ mb: 2 }}>Exercises</Typography>
-            <Box>
-                {workoutPlan.exercises.map(({ exercise, sets, reps }, index) => (
-                    <Paper key={index} variant="outlined" sx={{ p: 2, mb: 2 }}>
-                        <Typography variant="h6">{exercise.name}</Typography>
-                        <Typography>Sets: {sets}</Typography>
-                        <Typography>Reps: {reps}</Typography>
-                    </Paper>
-                ))}
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                <Typography variant="h5" component="h2">Exercises</Typography>
+                <Button variant="contained" color="primary" startIcon={<AddIcon />}>
+                    Add Exercise
+                </Button>
             </Box>
+
+            <List>
+                {workoutPlan.exercises.map(({ exercise, sets, reps }, index) => (
+                    <ListItem
+                        key={index}
+                        secondaryAction={
+                            <>
+                                <IconButton edge="end" aria-label="edit">
+                                    <EditIcon />
+                                </IconButton>
+                                <IconButton edge="end" aria-label="delete" sx={{ ml: 1 }}>
+                                    <DeleteIcon />
+                                </IconButton>
+                            </>
+                        }
+                        sx={{
+                            mb: 1,
+                            bgcolor: 'background.default',
+                            borderRadius: 2,
+                            p: 2
+                        }}
+                    >
+                        <ListItemAvatar>
+                            <Avatar>
+                                <FitnessCenterIcon />
+                            </Avatar>
+                        </ListItemAvatar>
+                        <ListItemText
+                            primary={exercise.name}
+                            secondary={`Sets: ${sets} | Reps: ${reps}`}
+                        />
+                    </ListItem>
+                ))}
+            </List>
+
+            {workoutPlan.exercises.length === 0 && (
+                <Typography sx={{ textAlign: 'center', my: 4 }} color="text.secondary">
+                    This plan has no exercises yet. Add one to get started!
+                </Typography>
+            )}
+
+            <Fab
+                color="primary"
+                variant="extended"
+                aria-label="start workout"
+                sx={{ position: 'fixed', bottom: 24, right: 24 }}
+                onClick={() => navigate(`/workouts/active/${workoutPlan._id}`)}
+            >
+                <PlayArrowIcon sx={{ mr: 1 }} />
+                Start Workout
+            </Fab>
         </Paper>
     );
 };
