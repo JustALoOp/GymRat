@@ -12,7 +12,12 @@ describe('RegisterPage', () => {
     });
 
     it('should register a user and redirect to login', async () => {
-        mockedAxios.post.mockResolvedValue({});
+        mockedAxios.post.mockResolvedValue({
+            data: {
+                success: true,
+                token: 'mock-jwt-token',
+            },
+        });
         render(
             <BrowserRouter>
                 <RegisterPage />

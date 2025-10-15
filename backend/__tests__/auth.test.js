@@ -2,6 +2,10 @@ const request = require('supertest');
 const { app, server } = require('../server');
 const User = require('../models/User');
 
+beforeEach(async () => {
+    await User.deleteMany({});
+});
+
 afterAll(() => {
     server.close();
 });
@@ -59,5 +63,27 @@ describe('Auth Endpoints', () => {
                 password: 'wrongpassword',
             });
         expect(res.statusCode).toEqual(401);
+    });
+
+    it('should get current user with /me endpoint', async () => {
+        const registerRes = await request(app)
+            .post('/api/v1/auth/register')
+            .send({
+                name: 'Test User 4',
+                email: 'test4@example.com',
+                password: 'password123',
+            });
+
+        const token = registerRes.body.token;
+
+        const res = await request(app)
+            .get('/api/v1/auth/me')
+            .set('Authorization', `Bearer ${token}`);
+
+        expect(res.statusCode).toEqual(200);
+        expect(res.body.success).toBe(true);
+        expect(res.body.data).toHaveProperty('_id');
+        expect(res.body.data.name).toBe('Test User 4');
+        expect(res.body.data.email).toBe('test4@example.com');
     });
 });
