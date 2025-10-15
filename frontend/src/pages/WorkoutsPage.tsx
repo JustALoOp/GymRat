@@ -1,177 +1,109 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useLocation } from 'react-router-dom';
 import {
     Typography,
     CircularProgress,
     Alert,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogContentText,
-    DialogTitle,
-    Button,
     Box,
-    Paper,
+    Grid,
+    Card,
+    CardContent,
+    Snackbar,
 } from '@mui/material';
-import WorkoutList from '../components/WorkoutList';
-import WorkoutForm from '../components/WorkoutForm';
-import { getWorkouts, deleteWorkout } from '../api/workouts';
-
-interface Workout {
-    _id: string;
-    exercise: string;
-    reps: number;
-    sets: number;
-    weight: number;
-    createdAt: string;
-}
+import { getWorkoutSessions } from '../api/workoutSessions';
+import type { IWorkoutSession } from '../types/workoutSession';
 
 const WorkoutsPage: React.FC = () => {
-    const [workouts, setWorkouts] = useState<Workout[]>([]);
+    const [sessions, setSessions] = useState<IWorkoutSession[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
-    const [workoutToEdit, setWorkoutToEdit] = useState<Workout | null>(null);
-    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-    const [workoutToDelete, setWorkoutToDelete] = useState<string | null>(null);
-    const [formOpen, setFormOpen] = useState(false);
+    const [snackbar, setSnackbar] = useState<{ open: boolean, message: string }>({ open: false, message: '' });
+    const token = localStorage.getItem('token');
+    const location = useLocation();
 
-    const fetchWorkouts = useCallback(async () => {
+    useEffect(() => {
+        if (location.state?.message) {
+            setSnackbar({ open: true, message: location.state.message });
+            // Clear the state so the message doesn't reappear on refresh
+            window.history.replaceState({}, document.title)
+        }
+    }, [location]);
+
+    const fetchWorkoutSessions = useCallback(async () => {
+        if (!token) {
+            setError('Authentication token not found. Please log in.');
+            setLoading(false);
+            return;
+        }
         try {
             setLoading(true);
-            const token = localStorage.getItem('token');
-            if (!token) {
-                setError('Authentication token not found. Please log in.');
-                setLoading(false);
-                return;
-            }
-            const data = await getWorkouts(token);
-            setWorkouts(data);
+            const data = await getWorkoutSessions(token);
+            setSessions(data.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())); // Sort by most recent
         } catch (err) {
-            setError('Failed to fetch workouts.');
+            setError('Failed to fetch workout sessions.');
             console.error(err);
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [token]);
 
     useEffect(() => {
-        fetchWorkouts();
-    }, [fetchWorkouts]);
+        fetchWorkoutSessions();
+    }, [fetchWorkoutSessions]);
 
-    const handleWorkoutAdded = () => {
-        fetchWorkouts();
-        setFormOpen(false);
-    };
-
-    const handleWorkoutUpdated = () => {
-        setWorkoutToEdit(null);
-        fetchWorkouts();
-        setFormOpen(false);
-    };
-
-    const handleEditWorkout = (workout: Workout) => {
-        setWorkoutToEdit(workout);
-        setFormOpen(true);
-    };
-
-    const handleOpenForm = () => {
-        setWorkoutToEdit(null);
-        setFormOpen(true);
-    };
-
-    const handleCloseForm = () => {
-        setWorkoutToEdit(null);
-        setFormOpen(false);
-    };
-
-    const handleDeleteRequest = (id: string) => {
-        setWorkoutToDelete(id);
-        setDeleteDialogOpen(true);
-    };
-
-    const handleCloseDeleteDialog = () => {
-        setDeleteDialogOpen(false);
-        setWorkoutToDelete(null);
-    };
-
-    const handleConfirmDelete = async () => {
-        if (workoutToDelete) {
-            try {
-                const token = localStorage.getItem('token');
-                if (!token) {
-                    setError('Authentication token not found. Please log in.');
-                    return;
-                }
-                await deleteWorkout(workoutToDelete, token);
-                setWorkouts((prevWorkouts) => prevWorkouts.filter((w) => w._id !== workoutToDelete));
-            } catch (err) {
-                setError('Failed to delete workout.');
-                console.error(err);
-            } finally {
-                handleCloseDeleteDialog();
-            }
-        }
+    const handleCloseSnackbar = () => {
+        setSnackbar({ ...snackbar, open: false });
     };
 
     return (
         <Box>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                <Typography variant="h4" component="h1">
-                    Your Workouts
+            <Typography variant="h4" component="h1" gutterBottom>
+                Workout History
+            </Typography>
+
+            {loading ? (
+                <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
+                    <CircularProgress />
+                </Box>
+            ) : error ? (
+                <Alert severity="error" sx={{ mt: 2 }}>
+                    {error}
+                </Alert>
+            ) : sessions.length === 0 ? (
+                <Typography sx={{ mt: 3 }}>
+                    You haven't completed any workouts yet. Go start one!
                 </Typography>
-                <Button variant="contained" color="primary" onClick={handleOpenForm}>
-                    Add New Workout
-                </Button>
-            </Box>
+            ) : (
+                <Grid container spacing={3} sx={{ mt: 1 }}>
+                    {sessions.map((session) => (
+                        <Grid item xs={12} md={6} lg={4} key={session._id}>
+                            <Card>
+                                <CardContent>
+                                    <Typography variant="h6">
+                                        {session.workoutPlan?.name || 'Workout Session'}
+                                    </Typography>
+                                    <Typography color="text.secondary" sx={{ mb: 1.5 }}>
+                                        {new Date(session.date).toLocaleDateString('en-US', {
+                                            year: 'numeric', month: 'long', day: 'numeric'
+                                        })}
+                                    </Typography>
+                                    <Typography variant="body2">
+                                        {session.performedExercises.length} exercise(s) completed.
+                                    </Typography>
+                                </CardContent>
+                            </Card>
+                        </Grid>
+                    ))}
+                </Grid>
+            )}
 
-            <Dialog open={formOpen} onClose={handleCloseForm} maxWidth="sm" fullWidth>
-                <DialogTitle>{workoutToEdit ? 'Edit Workout' : 'Add New Workout'}</DialogTitle>
-                <DialogContent>
-                    <WorkoutForm
-                        onWorkoutAdded={handleWorkoutAdded}
-                        workoutToEdit={workoutToEdit}
-                        onWorkoutUpdated={handleWorkoutUpdated}
-                        onCancel={handleCloseForm}
-                    />
-                </DialogContent>
-            </Dialog>
-
-            <Paper elevation={3} sx={{ mt: 3, p: 2 }}>
-                {loading ? (
-                    <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
-                        <CircularProgress />
-                    </Box>
-                ) : error ? (
-                    <Alert severity="error">
-                        {error}
-                    </Alert>
-                ) : (
-                    <WorkoutList
-                        workouts={workouts}
-                        onDelete={handleDeleteRequest}
-                        onEdit={handleEditWorkout}
-                    />
-                )}
-            </Paper>
-
-            <Dialog
-                open={deleteDialogOpen}
-                onClose={handleCloseDeleteDialog}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
-            >
-                <DialogTitle id="alert-dialog-title">{"Confirm Delete"}</DialogTitle>
-                <DialogContent>
-                    <DialogContentText id="alert-dialog-description">
-                        Are you sure you want to delete this workout? This action cannot be undone.
-                    </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCloseDeleteDialog}>Cancel</Button>
-                    <Button onClick={handleConfirmDelete} color="primary" autoFocus>
-                        Delete
-                    </Button>
-                </DialogActions>
-            </Dialog>
+            <Snackbar
+                open={snackbar.open}
+                autoHideDuration={6000}
+                onClose={handleCloseSnackbar}
+                message={snackbar.message}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+            />
         </Box>
     );
 };

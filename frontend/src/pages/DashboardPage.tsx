@@ -16,8 +16,8 @@ import {
 import type { SelectChangeEvent } from '@mui/material';
 import VolumeChart from '../components/VolumeChart';
 import { getUniqueExercises } from '../api/stats';
-import { getWorkouts } from '../api/workouts';
-import type { Workout } from '../types/workout';
+import { getWorkoutSessions } from '../api/workoutSessions';
+import type { IWorkoutSession } from '../types/workoutSession';
 
 const StatCard: React.FC<{ title: string; value: string | number; loading?: boolean }> = ({ title, value, loading }) => (
     <Card sx={{ height: '100%' }}>
@@ -35,7 +35,7 @@ const StatCard: React.FC<{ title: string; value: string | number; loading?: bool
 const DashboardPage: React.FC = () => {
     const token = localStorage.getItem('token');
     const [exercises, setExercises] = useState<{ _id: string; name: string }[]>([]);
-    const [workouts, setWorkouts] = useState<Workout[]>([]);
+    const [sessions, setSessions] = useState<IWorkoutSession[]>([]);
     const [selectedExerciseId, setSelectedExerciseId] = useState<string>('');
     const [selectedExerciseName, setSelectedExerciseName] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(true);
@@ -46,13 +46,13 @@ const DashboardPage: React.FC = () => {
             if (token) {
                 try {
                     setLoading(true);
-                    const [uniqueExercises, allWorkouts] = await Promise.all([
+                    const [uniqueExercises, allSessions] = await Promise.all([
                         getUniqueExercises(token),
-                        getWorkouts(token),
+                        getWorkoutSessions(token),
                     ]);
 
                     setExercises(uniqueExercises);
-                    setWorkouts(allWorkouts);
+                    setSessions(allSessions);
 
                     if (uniqueExercises.length > 0) {
                         setSelectedExerciseId(uniqueExercises[0]._id);
@@ -60,7 +60,6 @@ const DashboardPage: React.FC = () => {
                     }
                 } catch (err) {
                     setError('Failed to fetch dashboard data.');
-                    console.error(err);
                 } finally {
                     setLoading(false);
                 }
@@ -82,31 +81,42 @@ const DashboardPage: React.FC = () => {
         }
     };
 
-    const lastWorkout = useMemo(() => {
-        if (workouts.length === 0) return null;
-        return workouts.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
-    }, [workouts]);
+    const lastWorkoutDate = useMemo(() => {
+        if (sessions.length === 0) return null;
+        return sessions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0].date;
+    }, [sessions]);
 
     const personalBest = useMemo(() => {
-        if (!selectedExerciseId) return { weight: 0, reps: 0 };
+        if (!selectedExerciseId || sessions.length === 0) return { weight: 0, reps: 0 };
 
-        const exerciseWorkouts = workouts.filter(w => w.exercise === selectedExerciseId);
-        if (exerciseWorkouts.length === 0) return { weight: 0, reps: 0 };
+        let maxWeight = 0;
+        let repsForMaxWeight = 0;
 
-        return exerciseWorkouts.reduce(
-            (max, w) => {
-                if (w.weight > max.weight) {
-                    return { weight: w.weight, reps: w.reps };
+        sessions.forEach(session => {
+            session.performedExercises.forEach(pEx => {
+                if (pEx.exercise._id === selectedExerciseId) {
+                    pEx.sets.forEach(set => {
+                        if (set.weight > maxWeight) {
+                            maxWeight = set.weight;
+                            repsForMaxWeight = set.reps;
+                        }
+                    });
                 }
-                return max;
-            },
-            { weight: 0, reps: 0 }
-        );
-    }, [workouts, selectedExerciseId]);
+            });
+        });
+
+        return { weight: maxWeight, reps: repsForMaxWeight };
+    }, [sessions, selectedExerciseId]);
 
     const totalVolume = useMemo(() => {
-        return workouts.reduce((acc, w) => acc + w.weight * w.sets * w.reps, 0);
-    }, [workouts]);
+        return sessions.reduce((total, session) => {
+            return total + session.performedExercises.reduce((sessionTotal, pEx) => {
+                return sessionTotal + pEx.sets.reduce((exTotal, set) => {
+                    return exTotal + (set.weight * set.reps);
+                }, 0);
+            }, 0);
+        }, 0);
+    }, [sessions]);
 
     if (loading) {
         return <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}><CircularProgress /></Box>;
@@ -131,7 +141,7 @@ const DashboardPage: React.FC = () => {
                     <Paper elevation={3} sx={{ p: 2, height: '100%' }}>
                         <StatCard
                             title="Last Workout"
-                            value={lastWorkout ? new Date(lastWorkout.createdAt).toLocaleDateString() : 'N/A'}
+                            value={lastWorkoutDate ? new Date(lastWorkoutDate).toLocaleDateString() : 'N/A'}
                             loading={loading}
                         />
                     </Paper>
@@ -168,8 +178,8 @@ const DashboardPage: React.FC = () => {
                                 </Select>
                             </FormControl>
                         </Box>
-                        {token && selectedExerciseId ? (
-                            <VolumeChart exerciseId={selectedExerciseId} token={token} />
+                        {token && selectedExerciseId && sessions.length > 0 ? (
+                            <VolumeChart exerciseId={selectedExerciseId} sessions={sessions} />
                         ) : (
                             <Typography sx={{ mt: 2, textAlign: 'center' }}>
                                 {exercises.length > 0 ? 'Select an exercise to see the chart.' : 'No workout data available to display charts.'}

@@ -1,5 +1,6 @@
 import React from 'react';
-import { List, ListItem, ListItemText, Typography } from '@mui/material';
+import { Grid, Card, CardContent, Typography, CardActionArea } from '@mui/material';
+import { Link } from 'react-router-dom';
 import type { IWorkoutPlan } from '../types/workoutPlan';
 
 interface WorkoutPlanListProps {
@@ -12,13 +13,27 @@ const WorkoutPlanList: React.FC<WorkoutPlanListProps> = ({ workoutPlans }) => {
     }
 
     return (
-        <List>
+        <Grid container spacing={3}>
             {workoutPlans.map((plan) => (
-                <ListItem key={plan._id}>
-                    <ListItemText primary={plan.name} secondary={plan.description} />
-                </ListItem>
+                <Grid item xs={12} sm={6} md={4} key={plan._id}>
+                    <Card sx={{ height: '100%' }}>
+                        <CardActionArea component={Link} to={`/workout-plans/${plan._id}`} sx={{ height: '100%' }}>
+                            <CardContent>
+                                <Typography variant="h5" component="div">
+                                    {plan.name}
+                                </Typography>
+                                <Typography sx={{ mt: 1.5 }} color="text.secondary">
+                                    {plan.description || 'No description available.'}
+                                </Typography>
+                                <Typography sx={{ mt: 2 }} variant="body2">
+                                    {plan.exercises.length} exercise(s)
+                                </Typography>
+                            </CardContent>
+                        </CardActionArea>
+                    </Card>
+                </Grid>
             ))}
-        </List>
+        </Grid>
     );
 };
 

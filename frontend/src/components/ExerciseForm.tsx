@@ -5,7 +5,7 @@ import { createExercise, updateExercise } from '../api/exercises';
 import type { ExerciseInput } from '../api/exercises';
 
 interface ExerciseFormProps {
-    onSuccess: () => void;
+    onSuccess: (message: string) => void;
     onCancel: () => void;
     exerciseToEdit?: Exercise | null;
 }
@@ -42,10 +42,11 @@ const ExerciseForm: React.FC<ExerciseFormProps> = ({ onSuccess, onCancel, exerci
         try {
             if (exerciseToEdit) {
                 await updateExercise(exerciseToEdit._id, exerciseData, token);
+                onSuccess('Exercise updated successfully!');
             } else {
                 await createExercise(exerciseData, token);
+                onSuccess('Exercise created successfully!');
             }
-            onSuccess();
         } catch (err) {
             setError('Failed to save the exercise. Please try again.');
             console.error(err);

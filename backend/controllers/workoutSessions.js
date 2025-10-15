@@ -1,105 +1,43 @@
 const WorkoutSession = require('../models/WorkoutSession');
+const WorkoutPlan = require('../models/WorkoutPlan');
+const asyncHandler = require('../middleware/async');
+const ErrorResponse = require('../utils/errorResponse');
 
-// @desc    Get all workout sessions
+// @desc    Get all workout sessions for the logged-in user
 // @route   GET /api/v1/workoutsessions
 // @access  Private
-exports.getWorkoutSessions = async (req, res, next) => {
-    try {
-        const workoutSessions = await WorkoutSession.find({ user: req.user.id }).populate({
-            path: 'exercises.exercise',
-            select: 'name muscleGroup'
-        });
-        res.status(200).json({ success: true, count: workoutSessions.length, data: workoutSessions });
-    } catch (err) {
-        res.status(400).json({ success: false, error: err.message });
-    }
-};
+exports.getWorkoutSessions = asyncHandler(async (req, res, next) => {
+    const sessions = await WorkoutSession.find({ user: req.user.id }).populate({
+        path: 'performedExercises.exercise',
+        select: 'name'
+    }).populate('workoutPlan', 'name');
 
-// @desc    Get single workout session
-// @route   GET /api/v1/workoutsessions/:id
-// @access  Private
-exports.getWorkoutSession = async (req, res, next) => {
-    try {
-        const workoutSession = await WorkoutSession.findById(req.params.id).populate({
-            path: 'exercises.exercise',
-            select: 'name muscleGroup'
-        });
+    res.status(200).json({
+        success: true,
+        count: sessions.length,
+        data: sessions,
+    });
+});
 
-        if (!workoutSession) {
-            return res.status(404).json({ success: false, error: 'Workout session not found' });
-        }
-
-        // Make sure user is workout session owner
-        if (workoutSession.user.toString() !== req.user.id) {
-            return res.status(401).json({ success: false, error: 'Not authorized to access this workout session' });
-        }
-
-        res.status(200).json({ success: true, data: workoutSession });
-    } catch (err) {
-        res.status(400).json({ success: false, error: err.message });
-    }
-};
-
-// @desc    Create new workout session
+// @desc    Create a new workout session
 // @route   POST /api/v1/workoutsessions
 // @access  Private
-exports.createWorkoutSession = async (req, res, next) => {
-    try {
-        req.body.user = req.user.id;
-        const workoutSession = await WorkoutSession.create(req.body);
-        res.status(201).json({ success: true, data: workoutSession });
-    } catch (err) {
-        res.status(400).json({ success: false, error: err.message });
+exports.createWorkoutSession = asyncHandler(async (req, res, next) => {
+    req.body.user = req.user.id;
+
+    // Validate that the workout plan exists and belongs to the user
+    const workoutPlan = await WorkoutPlan.findById(req.body.workoutPlan);
+    if (!workoutPlan) {
+        return next(new ErrorResponse(`Workout plan not found with id of ${req.body.workoutPlan}`, 404));
     }
-};
-
-// @desc    Update workout session
-// @route   PUT /api/v1/workoutsessions/:id
-// @access  Private
-exports.updateWorkoutSession = async (req, res, next) => {
-    try {
-        let workoutSession = await WorkoutSession.findById(req.params.id);
-
-        if (!workoutSession) {
-            return res.status(404).json({ success: false, error: 'Workout session not found' });
-        }
-
-        // Make sure user is workout session owner
-        if (workoutSession.user.toString() !== req.user.id) {
-            return res.status(401).json({ success: false, error: 'Not authorized to update this workout session' });
-        }
-
-        workoutSession = await WorkoutSession.findByIdAndUpdate(req.params.id, req.body, {
-            new: true,
-            runValidators: true,
-        });
-
-        res.status(200).json({ success: true, data: workoutSession });
-    } catch (err) {
-        res.status(400).json({ success: false, error: err.message });
+    if (workoutPlan.user.toString() !== req.user.id) {
+        return next(new ErrorResponse(`User not authorized to use this workout plan`, 401));
     }
-};
 
-// @desc    Delete workout session
-// @route   DELETE /api/v1/workoutsessions/:id
-// @access  Private
-exports.deleteWorkoutSession = async (req, res, next) => {
-    try {
-        const workoutSession = await WorkoutSession.findById(req.params.id);
+    const session = await WorkoutSession.create(req.body);
 
-        if (!workoutSession) {
-            return res.status(404).json({ success: false, error: 'Workout session not found' });
-        }
-
-        // Make sure user is workout session owner
-        if (workoutSession.user.toString() !== req.user.id) {
-            return res.status(401).json({ success: false, error: 'Not authorized to delete this workout session' });
-        }
-
-        await workoutSession.remove();
-
-        res.status(200).json({ success: true, data: {} });
-    } catch (err) {
-        res.status(400).json({ success: false, error: err.message });
-    }
-};
+    res.status(201).json({
+        success: true,
+        data: session,
+    });
+});

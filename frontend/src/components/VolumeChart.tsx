@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { getVolumeHistory } from '../api/stats';
+import React, { useMemo } from 'react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Label } from 'recharts';
+import type { IWorkoutSession } from '../types/workoutSession';
 
 interface VolumeData {
     date: string;
@@ -9,35 +9,36 @@ interface VolumeData {
 
 interface VolumeChartProps {
     exerciseId: string;
-    token: string;
+    sessions: IWorkoutSession[];
 }
 
-const VolumeChart: React.FC<VolumeChartProps> = ({ exerciseId, token }) => {
-    const [data, setData] = useState<VolumeData[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+const VolumeChart: React.FC<VolumeChartProps> = ({ exerciseId, sessions }) => {
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const history = await getVolumeHistory(exerciseId, token);
-                setData(history);
-            } catch (err) {
-                setError('Failed to fetch volume history');
-            } finally {
-                setLoading(false);
-            }
-        };
+    const data: VolumeData[] = useMemo(() => {
+        const volumeByDate: { [date: string]: number } = {};
 
-        fetchData();
-    }, [exerciseId, token]);
+        sessions.forEach(session => {
+            const date = new Date(session.date).toLocaleDateString('en-CA'); // YYYY-MM-DD for sorting
 
-    if (loading) {
-        return <div>Loading...</div>;
-    }
+            session.performedExercises.forEach(pEx => {
+                if (pEx.exercise._id === exerciseId) {
+                    const dailyVolume = pEx.sets.reduce((total, set) => total + (set.weight * set.reps), 0);
+                    if (!volumeByDate[date]) {
+                        volumeByDate[date] = 0;
+                    }
+                    volumeByDate[date] += dailyVolume;
+                }
+            });
+        });
 
-    if (error) {
-        return <div>{error}</div>;
+        return Object.entries(volumeByDate)
+            .map(([date, volume]) => ({ date, volume }))
+            .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+    }, [exerciseId, sessions]);
+
+    if (data.length === 0) {
+        return <div>No data available for this exercise.</div>;
     }
 
     return (

@@ -3,12 +3,14 @@ import type { IWorkoutPlan } from '../types/workoutPlan';
 
 const API_URL = '/api/v1/workoutplans';
 
+export interface WorkoutPlanExerciseInput {
+    exercise: string;
+    sets: number;
+    reps: string;
+}
+
 export type WorkoutPlanInput = Omit<IWorkoutPlan, '_id' | 'user' | 'createdAt' | 'exercises'> & {
-    exercises: {
-        exercise: string;
-        sets: number;
-        reps: string;
-    }[];
+    exercises?: WorkoutPlanExerciseInput[];
 };
 
 

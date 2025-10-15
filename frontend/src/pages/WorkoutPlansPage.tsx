@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Typography, Button, Box, CircularProgress, Paper, Alert } from '@mui/material';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Typography, Button, Box, CircularProgress, Paper, Alert, Snackbar } from '@mui/material';
 import WorkoutPlanList from '../components/WorkoutPlanList';
 import WorkoutPlanForm from '../components/WorkoutPlanForm';
 import { getWorkoutPlans, createWorkoutPlan, WorkoutPlanInput } from '../api/workoutPlans';
@@ -10,49 +10,54 @@ const WorkoutPlansPage: React.FC = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [isFormVisible, setFormVisible] = useState(false);
+    const [snackbar, setSnackbar] = useState<{ open: boolean, message: string, severity: 'success' | 'error' }>({ open: false, message: '', severity: 'success' });
+    const token = localStorage.getItem('token');
 
-    useEffect(() => {
-        const fetchWorkoutPlans = async () => {
-            const token = localStorage.getItem('token');
-            if (!token) {
-                setError('Authentication token not found.');
-                setIsLoading(false);
-                return;
-            }
-            try {
-                const plans = await getWorkoutPlans(token);
-                setWorkoutPlans(plans);
-            } catch (err) {
-                setError('Failed to fetch workout plans.');
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        fetchWorkoutPlans();
-    }, []);
-
-    const handleCreatePlan = async (data: WorkoutPlanInput) => {
-        const token = localStorage.getItem('token');
+    const fetchWorkoutPlans = useCallback(async () => {
         if (!token) {
             setError('Authentication token not found.');
+            setIsLoading(false);
             return;
         }
         try {
-            const newPlan = await createWorkoutPlan(data, token);
-            setWorkoutPlans([...workoutPlans, newPlan]);
+            setIsLoading(true);
+            const plans = await getWorkoutPlans(token);
+            setWorkoutPlans(plans);
+        } catch (err) {
+            setError('Failed to fetch workout plans.');
+            setSnackbar({ open: true, message: 'Failed to fetch workout plans.', severity: 'error' });
+        } finally {
+            setIsLoading(false);
+        }
+    }, [token]);
+
+    useEffect(() => {
+        fetchWorkoutPlans();
+    }, [fetchWorkoutPlans]);
+
+    const handleCreatePlan = async (data: WorkoutPlanInput) => {
+        if (!token) {
+            setError('Authentication token not found.');
+            setSnackbar({ open: true, message: 'Authentication token not found.', severity: 'error' });
+            return;
+        }
+        try {
+            await createWorkoutPlan(data, token);
+            setSnackbar({ open: true, message: 'Workout plan created successfully!', severity: 'success' });
             setFormVisible(false);
+            fetchWorkoutPlans(); // Refresh the list
         } catch (err) {
             setError('Failed to create workout plan.');
+            setSnackbar({ open: true, message: 'Failed to create workout plan.', severity: 'error' });
         }
     };
 
-    if (isLoading) {
-        return <CircularProgress />;
-    }
+    const handleCloseSnackbar = () => {
+        setSnackbar({ ...snackbar, open: false });
+    };
 
-    if (error) {
-        return <Typography color="error">{error}</Typography>;
+    if (isLoading && !workoutPlans.length) {
+        return <CircularProgress />;
     }
 
     return (
@@ -72,21 +77,37 @@ const WorkoutPlansPage: React.FC = () => {
 
             {isFormVisible && (
                 <Paper elevation={3} sx={{ p: 2, mt: 2 }}>
-                    <WorkoutPlanForm onSubmit={handleCreatePlan} />
+                    <WorkoutPlanForm
+                        onSubmit={handleCreatePlan}
+                        onCancel={() => setFormVisible(false)}
+                    />
                 </Paper>
             )}
+
+            {error && !isFormVisible && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
 
             <Paper elevation={3} sx={{ mt: 3, p: 2 }}>
                 {isLoading ? (
                     <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
                         <CircularProgress />
                     </Box>
-                ) : error ? (
-                    <Alert severity="error">{error}</Alert>
+                ) : workoutPlans.length === 0 && !error ? (
+                     <Typography>No workout plans found. Create one to get started!</Typography>
                 ) : (
                     <WorkoutPlanList workoutPlans={workoutPlans} />
                 )}
             </Paper>
+
+            <Snackbar
+                open={snackbar.open}
+                autoHideDuration={6000}
+                onClose={handleCloseSnackbar}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+            >
+                <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
+                    {snackbar.message}
+                </Alert>
+            </Snackbar>
         </Box>
     );
 };

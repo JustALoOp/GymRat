@@ -17,6 +17,7 @@ import {
     TableRow,
     Paper,
     IconButton,
+    Snackbar,
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -30,6 +31,7 @@ const ExercisesPage: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [exerciseToEdit, setExerciseToEdit] = useState<Exercise | null>(null);
+    const [snackbar, setSnackbar] = useState<{ open: boolean, message: string, severity: 'success' | 'error' }>({ open: false, message: '', severity: 'success' });
     const token = localStorage.getItem('token');
 
     const fetchExercises = useCallback(async () => {
@@ -40,7 +42,6 @@ const ExercisesPage: React.FC = () => {
                 setExercises(data);
             } catch (err) {
                 setError('Failed to fetch exercises.');
-                console.error(err);
             } finally {
                 setLoading(false);
             }
@@ -64,21 +65,26 @@ const ExercisesPage: React.FC = () => {
         setExerciseToEdit(null);
     };
 
-    const handleSuccess = () => {
+    const handleSuccess = (message: string) => {
         handleCloseForm();
         fetchExercises();
+        setSnackbar({ open: true, message, severity: 'success' });
     };
 
     const handleDelete = async (id: string) => {
         if (token && window.confirm('Are you sure you want to delete this exercise?')) {
             try {
                 await deleteExercise(id, token);
-                fetchExercises(); // Refresh the list
+                fetchExercises();
+                setSnackbar({ open: true, message: 'Exercise deleted successfully!', severity: 'success' });
             } catch (err) {
-                setError('Failed to delete exercise.');
-                console.error(err);
+                setSnackbar({ open: true, message: 'Failed to delete exercise.', severity: 'error' });
             }
         }
+    };
+
+    const handleCloseSnackbar = () => {
+        setSnackbar({ ...snackbar, open: false });
     };
 
     if (!token) {
@@ -140,12 +146,23 @@ const ExercisesPage: React.FC = () => {
                 <DialogTitle>{exerciseToEdit ? 'Edit Exercise' : 'Add New Exercise'}</DialogTitle>
                 <DialogContent>
                     <ExerciseForm
-                        onSuccess={handleSuccess}
+                        onSuccess={(message) => handleSuccess(message)}
                         onCancel={handleCloseForm}
                         exerciseToEdit={exerciseToEdit}
                     />
                 </DialogContent>
             </Dialog>
+
+            <Snackbar
+                open={snackbar.open}
+                autoHideDuration={6000}
+                onClose={handleCloseSnackbar}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+            >
+                <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
+                    {snackbar.message}
+                </Alert>
+            </Snackbar>
         </Container>
     );
 };
