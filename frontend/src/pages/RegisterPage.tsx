@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import { register } from '../api/auth';
 import {
-    Container, Box, Typography, TextField, Button, Alert, CircularProgress, Grid, Card, CardContent, Link
+    Box, Typography, TextField, Button, Alert, CircularProgress, Grid, Card, CardContent, Link
 } from '@mui/material';
 import { isAxiosError } from 'axios';
 import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';

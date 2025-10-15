@@ -30,7 +30,7 @@ const WorkoutPlansPage: React.FC = () => {
         } finally {
             setIsLoading(false);
         }
-    }, [token]);
+    }, []);
 
     useEffect(() => {
         fetchWorkoutPlans();

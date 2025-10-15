@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { useTheme } from '@mui/material/styles';
 import type { IWorkoutSession } from '../types/workoutSession';
 
 interface VolumeData {
@@ -14,13 +13,12 @@ interface VolumeChartProps {
 }
 
 const VolumeChart: React.FC<VolumeChartProps> = ({ exerciseId, sessions }) => {
-    const theme = useTheme();
 
     const data: VolumeData[] = useMemo(() => {
         const volumeByDate: { [date: string]: number } = {};
 
         sessions.forEach(session => {
-            const date = new Date(session.date).toLocaleDateString('en-CA'); // YYYY-MM-DD
+            const date = new Date(session.date).toLocaleDateString('en-CA'); // YYYY-MM-DD for sorting
 
             session.performedExercises.forEach(pEx => {
                 if (pEx.exercise._id === exerciseId) {
@@ -40,30 +38,26 @@ const VolumeChart: React.FC<VolumeChartProps> = ({ exerciseId, sessions }) => {
     }, [exerciseId, sessions]);
 
     if (data.length === 0) {
-        return <div style={{ textAlign: 'center', padding: '20px' }}>No data available for this exercise.</div>;
+        return <div>No data available for this exercise.</div>;
     }
 
     return (
-        <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={data} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke={theme.palette.divider} />
-                <XAxis dataKey="date" stroke={theme.palette.text.secondary} />
-                <YAxis stroke={theme.palette.text.secondary} />
-                <Tooltip
-                    contentStyle={{
-                        backgroundColor: theme.palette.background.paper,
-                        borderColor: theme.palette.divider,
-                    }}
-                />
-                <Legend wrapperStyle={{ color: theme.palette.text.primary }} />
-                <Line
-                    type="monotone"
-                    dataKey="volume"
-                    stroke={theme.palette.primary.main}
-                    strokeWidth={2}
-                    activeDot={{ r: 8 }}
-                    dot={{ r: 4 }}
-                />
+        <ResponsiveContainer width="100%" height={400}>
+            <LineChart
+                data={data}
+                margin={{
+                    top: 5,
+                    right: 30,
+                    left: 20,
+                    bottom: 5,
+                }}
+            >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="date" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Line type="monotone" dataKey="volume" stroke="#8884d8" activeDot={{ r: 8 }} />
             </LineChart>
         </ResponsiveContainer>
     );

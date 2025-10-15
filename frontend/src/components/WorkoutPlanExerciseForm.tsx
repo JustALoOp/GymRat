@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
     TextField, Button, Box, Select, MenuItem, FormControl, InputLabel,
-    CircularProgress, Alert, Stack
+    Alert, Stack
 } from '@mui/material';
-import { getExercises } from '../api/exercises';
 import type { Exercise } from '../types/exercise';
 import type { WorkoutPlanExerciseInput } from '../api/workoutPlans';
 

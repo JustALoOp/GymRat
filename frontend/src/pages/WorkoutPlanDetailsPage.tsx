@@ -67,12 +67,10 @@ const WorkoutPlanDetailsPage: React.FC = () => {
         let updatedExercises: IWorkoutPlanExercise[];
 
         if (exerciseToEdit) {
-            // Update existing exercise
             updatedExercises = workoutPlan.exercises.map(ex =>
                 ex.exercise._id === exerciseToEdit.exercise._id ? { ...ex, ...data, exercise: ex.exercise } : ex
             );
         } else {
-            // Add new exercise
             const exerciseDetails = availableExercises.find(ex => ex._id === data.exercise);
             if (!exerciseDetails) {
                 setSnackbar({ open: true, message: 'Selected exercise not found.', severity: 'error' });
@@ -82,8 +80,14 @@ const WorkoutPlanDetailsPage: React.FC = () => {
             updatedExercises = [...workoutPlan.exercises, newExercise];
         }
 
+        const exercisesToSubmit = updatedExercises.map(ex => ({
+            exercise: ex.exercise._id,
+            sets: ex.sets,
+            reps: ex.reps,
+        }));
+
         try {
-            await updateWorkoutPlan(id, { exercises: updatedExercises });
+            await updateWorkoutPlan(id, { exercises: exercisesToSubmit });
             setSnackbar({ open: true, message: 'Plan updated successfully!', severity: 'success' });
             handleCloseForm();
             fetchWorkoutPlan();
@@ -96,9 +100,14 @@ const WorkoutPlanDetailsPage: React.FC = () => {
         if (!id || !workoutPlan || !window.confirm('Are you sure you want to remove this exercise?')) return;
 
         const updatedExercises = workoutPlan.exercises.filter(ex => ex.exercise._id !== exerciseId);
+        const exercisesToSubmit = updatedExercises.map(ex => ({
+            exercise: ex.exercise._id,
+            sets: ex.sets,
+            reps: ex.reps,
+        }));
 
         try {
-            await updateWorkoutPlan(id, { exercises: updatedExercises });
+            await updateWorkoutPlan(id, { exercises: exercisesToSubmit });
             setSnackbar({ open: true, message: 'Exercise removed successfully!', severity: 'success' });
             fetchWorkoutPlan();
         } catch (err) {

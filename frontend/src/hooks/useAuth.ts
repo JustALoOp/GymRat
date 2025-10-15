@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { getMe } from '../api/auth'; // Założenie, że ta funkcja istnieje
+import { useState, useEffect, useCallback } from 'react';
+import { getMe } from '../api/auth';
 import type { User } from '../types/user';
 
 export const useAuth = () => {
@@ -7,7 +7,7 @@ export const useAuth = () => {
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
-    const fetchUser = async () => {
+    const fetchUser = useCallback(async () => {
         try {
             setLoading(true);
             const data = await getMe();
@@ -17,11 +17,11 @@ export const useAuth = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
 
     useEffect(() => {
         fetchUser();
-    }, []);
+    }, [fetchUser]);
 
     return { user, loading, error, refetch: fetchUser };
 };
