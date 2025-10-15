@@ -1,33 +1,55 @@
-import axios from 'axios';
+import apiClient from './apiClient';
 
-const API_URL = '/api/v1/auth';
-
-interface AuthResponse {
+// Interface for the response from login/register endpoints
+export interface AuthResponse {
+    success: boolean;
     token: string;
 }
 
-interface User {
+// Interface for login credentials
+export interface LoginCredentials {
+    email: string;
+    password?: string;
+}
+
+// Interface for registration data
+export interface RegisterData {
     name: string;
     email: string;
     password?: string;
 }
 
-export const login = async (credentials: Pick<User, 'email' | 'password'>): Promise<AuthResponse> => {
-    const response = await axios.post<AuthResponse>(`${API_URL}/login`, credentials);
+/**
+ * Logs in a user.
+ * @param credentials - The user's login credentials.
+ * @returns The authentication token.
+ */
+export const login = async (credentials: LoginCredentials): Promise<AuthResponse> => {
+    const response = await apiClient.post<AuthResponse>('/auth/login', credentials);
     return response.data;
 };
 
-export const register = async (userData: User): Promise<AuthResponse> => {
-    const response = await axios.post<AuthResponse>(`${API_URL}/register`, userData);
+/**
+ * Registers a new user.
+ * @param userData - The data for the new user.
+ * @returns The authentication token.
+ */
+export const register = async (userData: RegisterData): Promise<AuthResponse> => {
+    const response = await apiClient.post<AuthResponse>('/auth/register', userData);
     return response.data;
 };
 
+/**
+ * Fetches the current logged-in user's data.
+ * @param token - The user's authentication token.
+ * @returns The user's data.
+ */
 export const getMe = async (token: string) => {
     const config = {
         headers: {
             Authorization: `Bearer ${token}`,
         },
     };
-    const response = await axios.get(`${API_URL}/me`, config);
+    const response = await apiClient.get('/auth/me', config);
     return response.data;
 };

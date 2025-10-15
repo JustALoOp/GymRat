@@ -16,7 +16,7 @@ import {
 import type { SelectChangeEvent } from '@mui/material';
 import VolumeChart from '../components/VolumeChart';
 import { getUniqueExercises } from '../api/stats';
-import { getWorkoutSessions } from '../api/workoutSessions';
+import { getWorkoutSessions } from '../api/workouts';
 import type { IWorkoutSession } from '../types/workoutSession';
 
 const StatCard: React.FC<{ title: string; value: string | number; loading?: boolean }> = ({ title, value, loading }) => (
@@ -47,8 +47,8 @@ const DashboardPage: React.FC = () => {
                 try {
                     setLoading(true);
                     const [uniqueExercises, allSessions] = await Promise.all([
-                        getUniqueExercises(token),
-                        getWorkoutSessions(token),
+                        getUniqueExercises(),
+                        getWorkoutSessions(),
                     ]);
 
                     setExercises(uniqueExercises);

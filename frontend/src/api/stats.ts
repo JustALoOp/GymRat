@@ -1,24 +1,20 @@
-import axios from 'axios';
+import apiClient from './apiClient';
 
-const API_URL = '/api/v1/stats';
-
-export const getVolumeHistory = async (exerciseId: string, token: string) => {
-    const config = {
-        headers: {
-            Authorization: `Bearer ${token}`,
-        },
-    };
-    const response = await axios.get(`${API_URL}/volume-history/${exerciseId}`, config);
+/**
+ * Fetches the volume history for a specific exercise.
+ * @param exerciseId - The ID of the exercise.
+ * @returns The volume history data.
+ */
+export const getVolumeHistory = async (exerciseId: string) => {
+    const response = await apiClient.get(`/stats/volume-history/${exerciseId}`);
     return response.data.data;
 };
 
-// Pobieranie unikalnych ćwiczeń
-export const getUniqueExercises = async (token: string) => {
-    const config = {
-        headers: {
-            Authorization: `Bearer ${token}`,
-        },
-    };
-    const response = await axios.get(`${API_URL}/unique-exercises`, config);
+/**
+ * Fetches a list of unique exercises performed by the user.
+ * @returns A list of unique exercises.
+ */
+export const getUniqueExercises = async () => {
+    const response = await apiClient.get('/stats/unique-exercises');
     return response.data.data;
 };

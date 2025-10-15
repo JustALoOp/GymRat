@@ -10,7 +10,7 @@ import {
     CardContent,
     Snackbar,
 } from '@mui/material';
-import { getWorkoutSessions } from '../api/workoutSessions';
+import { getWorkoutSessions } from '../api/workouts';
 import type { IWorkoutSession } from '../types/workoutSession';
 
 const WorkoutsPage: React.FC = () => {
@@ -18,7 +18,6 @@ const WorkoutsPage: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [snackbar, setSnackbar] = useState<{ open: boolean, message: string }>({ open: false, message: '' });
-    const token = localStorage.getItem('token');
     const location = useLocation();
 
     useEffect(() => {
@@ -30,14 +29,9 @@ const WorkoutsPage: React.FC = () => {
     }, [location]);
 
     const fetchWorkoutSessions = useCallback(async () => {
-        if (!token) {
-            setError('Authentication token not found. Please log in.');
-            setLoading(false);
-            return;
-        }
         try {
             setLoading(true);
-            const data = await getWorkoutSessions(token);
+            const data = await getWorkoutSessions();
             setSessions(data.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())); // Sort by most recent
         } catch (err) {
             setError('Failed to fetch workout sessions.');
@@ -45,7 +39,7 @@ const WorkoutsPage: React.FC = () => {
         } finally {
             setLoading(false);
         }
-    }, [token]);
+    }, []);
 
     useEffect(() => {
         fetchWorkoutSessions();

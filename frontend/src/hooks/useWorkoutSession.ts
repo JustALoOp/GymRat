@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { createWorkoutSession as apiCreateWorkoutSession } from '../api/workoutSessions';
+import { createWorkoutSession as apiCreateWorkoutSession } from '../api/workouts';
 import type { WorkoutSessionInput } from '../types/workoutSession';
 
 export const useWorkoutSession = () => {

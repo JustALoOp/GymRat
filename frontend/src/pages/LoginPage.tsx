@@ -11,6 +11,7 @@ import {
     CircularProgress,
     Stack,
 } from '@mui/material';
+import { isAxiosError } from 'axios';
 
 const LoginPage: React.FC = () => {
     const [email, setEmail] = useState('');
@@ -28,7 +29,11 @@ const LoginPage: React.FC = () => {
             localStorage.setItem('token', data.token);
             navigate('/dashboard');
         } catch (err) {
-            setError('Invalid email or password. Please try again.');
+            if (isAxiosError(err) && err.response) {
+                setError(err.response.data.error || 'An unexpected error occurred.');
+            } else {
+                setError('An unexpected error occurred.');
+            }
         } finally {
             setLoading(false);
         }

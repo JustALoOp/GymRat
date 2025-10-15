@@ -11,6 +11,7 @@ import {
     CircularProgress,
     Stack,
 } from '@mui/material';
+import { isAxiosError } from 'axios';
 
 const RegisterPage: React.FC = () => {
     const [name, setName] = useState('');
@@ -32,7 +33,11 @@ const RegisterPage: React.FC = () => {
             await register({ name, email, password });
             navigate('/login');
         } catch (err) {
-            setError('Failed to register. An account with this email may already exist.');
+            if (isAxiosError(err) && err.response) {
+                setError(err.response.data.error || 'An unexpected error occurred during registration.');
+            } else {
+                setError('An unexpected error occurred during registration.');
+            }
         } finally {
             setLoading(false);
         }
