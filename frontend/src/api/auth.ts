@@ -1,55 +1,53 @@
 import apiClient from './apiClient';
+import type { User } from '../types/user';
 
-// Interface for the response from login/register endpoints
 export interface AuthResponse {
     success: boolean;
     token: string;
 }
 
-// Interface for login credentials
 export interface LoginCredentials {
     email: string;
     password?: string;
 }
 
-// Interface for registration data
 export interface RegisterData {
     name: string;
     email: string;
     password?: string;
 }
 
-/**
- * Logs in a user.
- * @param credentials - The user's login credentials.
- * @returns The authentication token.
- */
+export interface UpdateDetailsData {
+    name?: string;
+    email?: string;
+}
+
+export interface UpdatePasswordData {
+    currentPassword?: string;
+    newPassword?: string;
+}
+
 export const login = async (credentials: LoginCredentials): Promise<AuthResponse> => {
     const response = await apiClient.post<AuthResponse>('/auth/login', credentials);
     return response.data;
 };
 
-/**
- * Registers a new user.
- * @param userData - The data for the new user.
- * @returns The authentication token.
- */
 export const register = async (userData: RegisterData): Promise<AuthResponse> => {
     const response = await apiClient.post<AuthResponse>('/auth/register', userData);
     return response.data;
 };
 
-/**
- * Fetches the current logged-in user's data.
- * @param token - The user's authentication token.
- * @returns The user's data.
- */
-export const getMe = async (token: string) => {
-    const config = {
-        headers: {
-            Authorization: `Bearer ${token}`,
-        },
-    };
-    const response = await apiClient.get('/auth/me', config);
+export const getMe = async (): Promise<User> => {
+    const response = await apiClient.get('/auth/me');
+    return response.data.data;
+};
+
+export const updateDetails = async (data: UpdateDetailsData): Promise<User> => {
+    const response = await apiClient.put('/auth/updatedetails', data);
+    return response.data.data;
+};
+
+export const updatePassword = async (data: UpdatePasswordData): Promise<AuthResponse> => {
+    const response = await apiClient.put('/auth/updatepassword', data);
     return response.data;
 };

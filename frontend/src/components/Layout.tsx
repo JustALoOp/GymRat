@@ -10,6 +10,7 @@ import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
 import EventNoteIcon from '@mui/icons-material/EventNote';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import ListAltIcon from '@mui/icons-material/ListAlt';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import LogoutIcon from '@mui/icons-material/Logout';
 
 const drawerWidth = 240;
@@ -76,6 +77,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             </List>
             <Divider />
             <List>
+                <ListItem disablePadding>
+                    <ListItemButton component={RouterLink} to="/profile">
+                        <ListItemIcon><AccountCircleIcon /></ListItemIcon>
+                        <ListItemText primary="Profile" />
+                    </ListItemButton>
+                </ListItem>
                 <ListItem disablePadding>
                     <ListItemButton onClick={handleLogout}>
                         <ListItemIcon>
