@@ -1,8 +1,10 @@
 import axios from 'axios';
+import type { Workout } from '../types/workout';
 
 const API_URL = '/api/v1/workoutsessions';
 
-interface WorkoutData {
+// Definicja typu dla danych wejściowych, bez _id i createdAt
+export interface WorkoutInput {
     exercise: string;
     sets: number;
     reps: number;
@@ -10,7 +12,7 @@ interface WorkoutData {
 }
 
 // Pobieranie wszystkich treningów
-export const getWorkouts = async (token: string) => {
+export const getWorkouts = async (token: string): Promise<Workout[]> => {
     const config = {
         headers: {
             Authorization: `Bearer ${token}`,
@@ -21,7 +23,7 @@ export const getWorkouts = async (token: string) => {
 };
 
 // Tworzenie nowego treningu
-export const createWorkout = async (workoutData: WorkoutData, token: string) => {
+export const createWorkout = async (workoutData: WorkoutInput, token: string): Promise<Workout> => {
     const config = {
         headers: {
             Authorization: `Bearer ${token}`,
@@ -32,18 +34,17 @@ export const createWorkout = async (workoutData: WorkoutData, token: string) => 
 };
 
 // Usuwanie treningu
-export const deleteWorkout = async (id: string, token: string) => {
+export const deleteWorkout = async (id: string, token: string): Promise<void> => {
     const config = {
         headers: {
             Authorization: `Bearer ${token}`,
         },
     };
-    const response = await axios.delete(`${API_URL}/${id}`, config);
-    return response.data.data;
+    await axios.delete(`${API_URL}/${id}`, config);
 };
 
 // Aktualizacja treningu
-export const updateWorkout = async (id: string, workoutData: Partial<WorkoutData>, token: string) => {
+export const updateWorkout = async (id: string, workoutData: Partial<WorkoutInput>, token: string): Promise<Workout> => {
     const config = {
         headers: {
             Authorization: `Bearer ${token}`,
