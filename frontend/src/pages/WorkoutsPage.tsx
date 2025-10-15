@@ -10,6 +10,7 @@ import {
     DialogContentText,
     DialogTitle,
     Button,
+    Box,
 } from '@mui/material';
 import WorkoutList from '../components/WorkoutList';
 import WorkoutForm from '../components/WorkoutForm';
@@ -31,6 +32,7 @@ const WorkoutsPage: React.FC = () => {
     const [workoutToEdit, setWorkoutToEdit] = useState<Workout | null>(null);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [workoutToDelete, setWorkoutToDelete] = useState<string | null>(null);
+    const [formOpen, setFormOpen] = useState(false);
 
     const fetchWorkouts = useCallback(async () => {
         try {
@@ -57,15 +59,28 @@ const WorkoutsPage: React.FC = () => {
 
     const handleWorkoutAdded = () => {
         fetchWorkouts();
+        setFormOpen(false);
     };
 
     const handleWorkoutUpdated = () => {
         setWorkoutToEdit(null);
         fetchWorkouts();
+        setFormOpen(false);
     };
 
     const handleEditWorkout = (workout: Workout) => {
         setWorkoutToEdit(workout);
+        setFormOpen(true);
+    };
+
+    const handleOpenForm = () => {
+        setWorkoutToEdit(null);
+        setFormOpen(true);
+    };
+
+    const handleCloseForm = () => {
+        setWorkoutToEdit(null);
+        setFormOpen(false);
     };
 
     const handleDeleteRequest = (id: string) => {
@@ -99,14 +114,27 @@ const WorkoutsPage: React.FC = () => {
 
     return (
         <Container>
-            <Typography variant="h4" component="h1" gutterBottom>
-                Your Workouts
-            </Typography>
-            <WorkoutForm
-                onWorkoutAdded={handleWorkoutAdded}
-                workoutToEdit={workoutToEdit}
-                onWorkoutUpdated={handleWorkoutUpdated}
-            />
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                <Typography variant="h4" component="h1" gutterBottom>
+                    Your Workouts
+                </Typography>
+                <Button variant="contained" color="primary" onClick={handleOpenForm}>
+                    Add New Workout
+                </Button>
+            </Box>
+
+            <Dialog open={formOpen} onClose={handleCloseForm} maxWidth="sm" fullWidth>
+                <DialogTitle>{workoutToEdit ? 'Edit Workout' : 'Add New Workout'}</DialogTitle>
+                <DialogContent>
+                    <WorkoutForm
+                        onWorkoutAdded={handleWorkoutAdded}
+                        workoutToEdit={workoutToEdit}
+                        onWorkoutUpdated={handleWorkoutUpdated}
+                        onCancel={handleCloseForm}
+                    />
+                </DialogContent>
+            </Dialog>
+
             {loading ? (
                 <CircularProgress sx={{ mt: 3 }} />
             ) : error ? (

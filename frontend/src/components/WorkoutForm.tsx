@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { TextField, Button, Box, Typography, Alert } from '@mui/material';
+import { TextField, Button, Box, Alert, Autocomplete } from '@mui/material';
 import { createWorkout, updateWorkout } from '../api/workouts';
+import { getUniqueExercises } from '../api/stats';
 
 interface Workout {
     _id: string;
@@ -15,10 +16,17 @@ interface WorkoutFormProps {
     onWorkoutAdded: () => void;
     workoutToEdit?: Workout | null;
     onWorkoutUpdated: () => void;
+    onCancel: () => void;
 }
 
-const WorkoutForm: React.FC<WorkoutFormProps> = ({ onWorkoutAdded, workoutToEdit, onWorkoutUpdated }) => {
+interface ExerciseOption {
+    _id: string;
+    name: string;
+}
+
+const WorkoutForm: React.FC<WorkoutFormProps> = ({ onWorkoutAdded, workoutToEdit, onWorkoutUpdated, onCancel }) => {
     const [exercise, setExercise] = useState('');
+    const [exerciseOptions, setExerciseOptions] = useState<string[]>([]);
     const [sets, setSets] = useState('');
     const [reps, setReps] = useState('');
     const [weight, setWeight] = useState('');
@@ -26,6 +34,20 @@ const WorkoutForm: React.FC<WorkoutFormProps> = ({ onWorkoutAdded, workoutToEdit
     const [isEditMode, setIsEditMode] = useState(false);
 
     useEffect(() => {
+        const fetchExercises = async () => {
+            try {
+                const token = localStorage.getItem('token');
+                if (token) {
+                    const uniqueExercises: ExerciseOption[] = await getUniqueExercises(token);
+                    setExerciseOptions(uniqueExercises.map(ex => ex.name));
+                }
+            } catch (err) {
+                console.error("Failed to fetch exercise options:", err);
+            }
+        };
+
+        fetchExercises();
+
         if (workoutToEdit) {
             setExercise(workoutToEdit.exercise);
             setSets(String(workoutToEdit.sets));
@@ -41,14 +63,16 @@ const WorkoutForm: React.FC<WorkoutFormProps> = ({ onWorkoutAdded, workoutToEdit
         }
     }, [workoutToEdit]);
 
-    const resetForm = () => {
+    const resetForm = (clearParentState = true) => {
         setExercise('');
         setSets('');
         setReps('');
         setWeight('');
         setError(null);
         setIsEditMode(false);
-        onWorkoutUpdated(); // To clear the workoutToEdit in parent
+        if (clearParentState) {
+            onWorkoutUpdated(); // To clear the workoutToEdit in parent
+        }
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -75,7 +99,7 @@ const WorkoutForm: React.FC<WorkoutFormProps> = ({ onWorkoutAdded, workoutToEdit
                 await createWorkout(workoutData, token);
                 onWorkoutAdded();
             }
-            resetForm();
+            resetForm(false); // Reset local form state, but parent will close modal
         } catch (err) {
             setError(isEditMode ? 'Failed to update workout.' : 'Failed to add workout.');
             console.error(err);
@@ -83,17 +107,28 @@ const WorkoutForm: React.FC<WorkoutFormProps> = ({ onWorkoutAdded, workoutToEdit
     };
 
     return (
-        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3, p: 2, border: '1px solid #ccc', borderRadius: 1 }}>
-            <Typography variant="h6">{isEditMode ? 'Edit Workout' : 'Add New Workout'}</Typography>
+        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
             {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-            <TextField
-                label="Exercise"
-                variant="outlined"
-                fullWidth
-                margin="normal"
+            <Autocomplete
+                freeSolo
+                options={exerciseOptions}
                 value={exercise}
-                onChange={(e) => setExercise(e.target.value)}
-                required
+                onChange={(_, newValue) => {
+                    setExercise(newValue || '');
+                }}
+                onInputChange={(_, newInputValue) => {
+                    setExercise(newInputValue);
+                }}
+                renderInput={(params) => (
+                    <TextField
+                        {...params}
+                        label="Exercise"
+                        variant="outlined"
+                        fullWidth
+                        margin="normal"
+                        required
+                    />
+                )}
             />
             <TextField
                 label="Sets"
@@ -125,15 +160,13 @@ const WorkoutForm: React.FC<WorkoutFormProps> = ({ onWorkoutAdded, workoutToEdit
                 onChange={(e) => setWeight(e.target.value)}
                 required
             />
-            <Box sx={{ mt: 2 }}>
+            <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
+                <Button onClick={onCancel} color="secondary" sx={{ mr: 1 }}>
+                    Cancel
+                </Button>
                 <Button type="submit" variant="contained" color="primary">
                     {isEditMode ? 'Update Workout' : 'Add Workout'}
                 </Button>
-                {isEditMode && (
-                    <Button variant="outlined" color="secondary" onClick={resetForm} sx={{ ml: 2 }}>
-                        Cancel Edit
-                    </Button>
-                )}
             </Box>
         </Box>
     );
