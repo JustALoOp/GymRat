@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import {
     Typography,
-    Container,
     Paper,
     Select,
     MenuItem,
@@ -118,38 +117,42 @@ const DashboardPage: React.FC = () => {
     }
 
     return (
-        <>
+        <Box>
             <Typography variant="h4" component="h1" gutterBottom>
                 Your Dashboard
             </Typography>
             <Grid container spacing={3}>
-                {/* Stat Cards */}
                 <Grid item xs={12} sm={6} md={4}>
-                    <StatCard title="Total Volume (kg)" value={totalVolume.toLocaleString()} loading={loading} />
+                    <Paper elevation={3} sx={{ p: 2, height: '100%' }}>
+                        <StatCard title="Total Volume (kg)" value={totalVolume.toLocaleString()} loading={loading} />
+                    </Paper>
                 </Grid>
                 <Grid item xs={12} sm={6} md={4}>
-                    <StatCard
-                        title="Last Workout"
-                        value={lastWorkout ? new Date(lastWorkout.createdAt).toLocaleDateString() : 'N/A'}
-                        loading={loading}
-                    />
+                    <Paper elevation={3} sx={{ p: 2, height: '100%' }}>
+                        <StatCard
+                            title="Last Workout"
+                            value={lastWorkout ? new Date(lastWorkout.createdAt).toLocaleDateString() : 'N/A'}
+                            loading={loading}
+                        />
+                    </Paper>
                 </Grid>
                 <Grid item xs={12} sm={6} md={4}>
-                    <StatCard
-                        title={`Personal Best (${selectedExerciseName || '...'})`}
-                        value={`${personalBest.weight} kg x ${personalBest.reps} reps`}
-                        loading={loading && !!selectedExerciseId}
-                    />
+                    <Paper elevation={3} sx={{ p: 2, height: '100%' }}>
+                        <StatCard
+                            title={`Personal Best (${selectedExerciseName || '...'})`}
+                            value={`${personalBest.weight} kg x ${personalBest.reps} reps`}
+                            loading={loading && !!selectedExerciseId}
+                        />
+                    </Paper>
                 </Grid>
 
-                {/* Volume Chart */}
                 <Grid item xs={12}>
                     <Paper elevation={3} sx={{ p: 2 }}>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                             <Typography variant="h6" component="h2">
                                 Volume History
                             </Typography>
-                            <FormControl sx={{ m: 1, minWidth: 200 }}>
+                            <FormControl sx={{ m: 1, minWidth: 200 }} size="small">
                                 <InputLabel id="exercise-select-label">Select Exercise</InputLabel>
                                 <Select
                                     labelId="exercise-select-label"
@@ -168,14 +171,14 @@ const DashboardPage: React.FC = () => {
                         {token && selectedExerciseId ? (
                             <VolumeChart exerciseId={selectedExerciseId} token={token} />
                         ) : (
-                            <Typography sx={{ mt: 2 }}>
+                            <Typography sx={{ mt: 2, textAlign: 'center' }}>
                                 {exercises.length > 0 ? 'Select an exercise to see the chart.' : 'No workout data available to display charts.'}
                             </Typography>
                         )}
                     </Paper>
                 </Grid>
             </Grid>
-        </>
+        </Box>
     );
 };
 

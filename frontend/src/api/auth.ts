@@ -12,13 +12,13 @@ interface User {
     password?: string;
 }
 
-export const login = async (credentials: Pick<User, 'email' | 'password'>) => {
+export const login = async (credentials: Pick<User, 'email' | 'password'>): Promise<AuthResponse> => {
     const response = await axios.post<AuthResponse>(`${API_URL}/login`, credentials);
     return response.data;
 };
 
-export const register = async (userData: User) => {
-    const response = await axios.post(`${API_URL}/register`, userData);
+export const register = async (userData: User): Promise<AuthResponse> => {
+    const response = await axios.post<AuthResponse>(`${API_URL}/register`, userData);
     return response.data;
 };
 

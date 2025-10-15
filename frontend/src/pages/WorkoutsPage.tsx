@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
     Typography,
-    Container,
     CircularProgress,
     Alert,
     Dialog,
@@ -11,6 +10,7 @@ import {
     DialogTitle,
     Button,
     Box,
+    Paper,
 } from '@mui/material';
 import WorkoutList from '../components/WorkoutList';
 import WorkoutForm from '../components/WorkoutForm';
@@ -113,9 +113,9 @@ const WorkoutsPage: React.FC = () => {
     };
 
     return (
-        <>
+        <Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                <Typography variant="h4" component="h1" gutterBottom>
+                <Typography variant="h4" component="h1">
                     Your Workouts
                 </Typography>
                 <Button variant="contained" color="primary" onClick={handleOpenForm}>
@@ -135,19 +135,24 @@ const WorkoutsPage: React.FC = () => {
                 </DialogContent>
             </Dialog>
 
-            {loading ? (
-                <CircularProgress sx={{ mt: 3 }} />
-            ) : error ? (
-                <Alert severity="error" sx={{ mt: 3 }}>
-                    {error}
-                </Alert>
-            ) : (
-                <WorkoutList
-                    workouts={workouts}
-                    onDelete={handleDeleteRequest}
-                    onEdit={handleEditWorkout}
-                />
-            )}
+            <Paper elevation={3} sx={{ mt: 3, p: 2 }}>
+                {loading ? (
+                    <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
+                        <CircularProgress />
+                    </Box>
+                ) : error ? (
+                    <Alert severity="error">
+                        {error}
+                    </Alert>
+                ) : (
+                    <WorkoutList
+                        workouts={workouts}
+                        onDelete={handleDeleteRequest}
+                        onEdit={handleEditWorkout}
+                    />
+                )}
+            </Paper>
+
             <Dialog
                 open={deleteDialogOpen}
                 onClose={handleCloseDeleteDialog}
@@ -167,7 +172,7 @@ const WorkoutsPage: React.FC = () => {
                     </Button>
                 </DialogActions>
             </Dialog>
-        </>
+        </Box>
     );
 };
 

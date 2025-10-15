@@ -29,6 +29,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                     <Button color="inherit" component={Link} to="/workouts">
                         Workouts
                     </Button>
+                    <Button color="inherit" component={Link} to="/workout-plans">
+                        Workout Plans
+                    </Button>
                     <Button color="inherit" onClick={handleLogout}>
                         Logout
                     </Button>

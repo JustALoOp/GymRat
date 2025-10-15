@@ -4,6 +4,7 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
 import WorkoutsPage from './pages/WorkoutsPage';
+import WorkoutPlansPage from './pages/WorkoutPlansPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
 
@@ -30,6 +31,16 @@ function App() {
                         <ProtectedRoute>
                             <Layout>
                                 <WorkoutsPage />
+                            </Layout>
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/workout-plans"
+                    element={
+                        <ProtectedRoute>
+                            <Layout>
+                                <WorkoutPlansPage />
                             </Layout>
                         </ProtectedRoute>
                     }

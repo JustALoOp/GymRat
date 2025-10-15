@@ -19,7 +19,7 @@ describe('Auth Endpoints', () => {
                 email: 'test@example.com',
                 password: 'password123',
             });
-        expect(res.statusCode).toEqual(200);
+        expect(res.statusCode).toEqual(201);
         expect(res.body).toHaveProperty('token');
 
         const user = await User.findOne({ email: 'test@example.com' });
