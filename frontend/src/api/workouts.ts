@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = '/api/v1/workouts';
+const API_URL = '/api/v1/workoutsessions';
 
 interface WorkoutData {
     exercise: string;
