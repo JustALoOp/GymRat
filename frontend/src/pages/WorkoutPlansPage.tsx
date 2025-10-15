@@ -1,6 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Typography, Button, Box, CircularProgress, Paper, Alert, Snackbar } from '@mui/material';
-import WorkoutPlanList from '../components/WorkoutPlanList';
+import {
+    Typography, Button, Box, CircularProgress, Alert, Snackbar, Grid, Card, CardContent,
+    CardActions, Dialog, DialogTitle, DialogContent, Fab
+} from '@mui/material';
+import { Link, useNavigate } from 'react-router-dom';
+import AddIcon from '@mui/icons-material/Add';
+import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
+import EditIcon from '@mui/icons-material/Edit';
 import WorkoutPlanForm from '../components/WorkoutPlanForm';
 import { getWorkoutPlans, createWorkoutPlan, WorkoutPlanInput } from '../api/workoutPlans';
 import type { IWorkoutPlan } from '../types/workoutPlan';
@@ -9,9 +15,10 @@ const WorkoutPlansPage: React.FC = () => {
     const [workoutPlans, setWorkoutPlans] = useState<IWorkoutPlan[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [isFormVisible, setFormVisible] = useState(false);
+    const [isFormOpen, setFormOpen] = useState(false);
     const [snackbar, setSnackbar] = useState<{ open: boolean, message: string, severity: 'success' | 'error' }>({ open: false, message: '', severity: 'success' });
     const token = localStorage.getItem('token');
+    const navigate = useNavigate();
 
     const fetchWorkoutPlans = useCallback(async () => {
         if (!token) {
@@ -21,7 +28,7 @@ const WorkoutPlansPage: React.FC = () => {
         }
         try {
             setIsLoading(true);
-            const plans = await getWorkoutPlans(token);
+            const plans = await getWorkoutPlans();
             setWorkoutPlans(plans);
         } catch (err) {
             setError('Failed to fetch workout plans.');
@@ -36,15 +43,10 @@ const WorkoutPlansPage: React.FC = () => {
     }, [fetchWorkoutPlans]);
 
     const handleCreatePlan = async (data: WorkoutPlanInput) => {
-        if (!token) {
-            setError('Authentication token not found.');
-            setSnackbar({ open: true, message: 'Authentication token not found.', severity: 'error' });
-            return;
-        }
         try {
-            await createWorkoutPlan(data, token);
+            await createWorkoutPlan(data);
             setSnackbar({ open: true, message: 'Workout plan created successfully!', severity: 'success' });
-            setFormVisible(false);
+            setFormOpen(false);
             fetchWorkoutPlans(); // Refresh the list
         } catch (err) {
             setError('Failed to create workout plan.');
@@ -57,46 +59,68 @@ const WorkoutPlansPage: React.FC = () => {
     };
 
     if (isLoading && !workoutPlans.length) {
-        return <CircularProgress />;
+        return <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}><CircularProgress /></Box>;
     }
 
     return (
         <Box>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                <Typography variant="h4">
-                    Workout Plans
-                </Typography>
-                <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={() => setFormVisible(!isFormVisible)}
-                >
-                    {isFormVisible ? 'Cancel' : 'Create New Plan'}
-                </Button>
-            </Box>
+            {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
 
-            {isFormVisible && (
-                <Paper elevation={3} sx={{ p: 2, mt: 2 }}>
-                    <WorkoutPlanForm
-                        onSubmit={handleCreatePlan}
-                        onCancel={() => setFormVisible(false)}
-                    />
-                </Paper>
+            <Grid container spacing={3}>
+                {workoutPlans.map((plan) => (
+                    <Grid item xs={12} sm={6} md={4} key={plan._id}>
+                        <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+                            <CardContent sx={{ flexGrow: 1 }}>
+                                <Typography variant="h5" component="div">
+                                    {plan.name}
+                                </Typography>
+                                <Typography sx={{ mt: 1.5 }} color="text.secondary">
+                                    {plan.description || 'No description available.'}
+                                </Typography>
+                                <Typography sx={{ mt: 2 }} variant="body2">
+                                    <FitnessCenterIcon sx={{ verticalAlign: 'middle', mr: 1 }} />
+                                    {plan.exercises.length} exercise(s)
+                                </Typography>
+                            </CardContent>
+                            <CardActions>
+                                <Button size="small" component={Link} to={`/workout-plans/${plan._id}`} startIcon={<EditIcon />}>
+                                    View & Edit
+                                </Button>
+                                <Button size="small" color="primary" onClick={() => navigate(`/workouts/active/${plan._id}`)}>
+                                    Start Workout
+                                </Button>
+                            </CardActions>
+                        </Card>
+                    </Grid>
+                ))}
+            </Grid>
+
+            { !isLoading && workoutPlans.length === 0 && !error && (
+                 <Box sx={{ textAlign: 'center', mt: 4 }}>
+                    <Typography variant="h6">No workout plans found.</Typography>
+                    <Typography color="text.secondary">Create one to get started!</Typography>
+                    <Button variant="contained" sx={{ mt: 2 }} onClick={() => setFormOpen(true)}>Create Your First Plan</Button>
+                </Box>
             )}
 
-            {error && !isFormVisible && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
+            <Fab
+                color="primary"
+                aria-label="add"
+                sx={{ position: 'fixed', bottom: 24, right: 24 }}
+                onClick={() => setFormOpen(true)}
+            >
+                <AddIcon />
+            </Fab>
 
-            <Paper elevation={3} sx={{ mt: 3, p: 2 }}>
-                {isLoading ? (
-                    <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
-                        <CircularProgress />
-                    </Box>
-                ) : workoutPlans.length === 0 && !error ? (
-                     <Typography>No workout plans found. Create one to get started!</Typography>
-                ) : (
-                    <WorkoutPlanList workoutPlans={workoutPlans} />
-                )}
-            </Paper>
+            <Dialog open={isFormOpen} onClose={() => setFormOpen(false)} maxWidth="sm" fullWidth>
+                <DialogTitle>Create New Workout Plan</DialogTitle>
+                <DialogContent>
+                    <WorkoutPlanForm
+                        onSubmit={handleCreatePlan}
+                        onCancel={() => setFormOpen(false)}
+                    />
+                </DialogContent>
+            </Dialog>
 
             <Snackbar
                 open={snackbar.open}
