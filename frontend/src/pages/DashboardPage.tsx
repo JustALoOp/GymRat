@@ -19,6 +19,8 @@ import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import DirectionsRunIcon from '@mui/icons-material/DirectionsRun';
 
 interface StatCardProps {
     title: string;
@@ -27,14 +29,34 @@ interface StatCardProps {
 }
 
 const StatCard: React.FC<StatCardProps> = ({ title, value, icon }) => (
-    <Card sx={{ display: 'flex', alignItems: 'center', p: 2, height: '100%' }}>
-        <Icon sx={{ fontSize: 40, color: 'primary.main', mr: 2 }}>{icon}</Icon>
-        <Box>
-            <Typography variant="h5" component="div">{value}</Typography>
-            <Typography color="text.secondary" sx={{ textTransform: 'uppercase' }}>
+    <Card
+        sx={{
+            p: 3,
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            height: '100%',
+            background: (theme) => `linear-gradient(145deg, ${theme.palette.background.paper}, ${theme.palette.background.default})`,
+            boxShadow: '0 4px 12px 0 rgba(0,0,0,0.1)',
+            transition: 'transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out',
+            '&:hover': {
+                transform: 'translateY(-5px)',
+                boxShadow: (theme) => `0 8px 20px 0 ${theme.palette.primary.main}33`,
+            }
+        }}
+    >
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <Typography
+                color="text.secondary"
+                sx={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '0.8rem' }}
+            >
                 {title}
             </Typography>
+            <Icon sx={{ fontSize: 32, color: 'primary.main', opacity: 0.8 }}>{icon}</Icon>
         </Box>
+        <Typography variant="h4" component="div" sx={{ fontWeight: 'bold', mt: 1 }}>
+            {value}
+        </Typography>
     </Card>
 );
 
@@ -68,6 +90,37 @@ const DashboardPage: React.FC = () => {
     if (isLoading) return <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '80vh' }}><CircularProgress /></Box>;
     if (error) return <Alert severity="error" sx={{ mt: 4 }}>{error}</Alert>;
 
+    if (totalWorkouts === 0) {
+        return (
+            <Box sx={{ textAlign: 'center', mt: 8 }}>
+                <Typography variant="h4" component="h1" gutterBottom>
+                    Welcome to GymRat, {user?.name.split(' ')[0] || 'User'}!
+                </Typography>
+                <Typography variant="h6" color="text.secondary" sx={{ mb: 4 }}>
+                    It looks like you're new here. Let's get you started.
+                </Typography>
+                <Grid container spacing={4} justifyContent="center">
+                    <Grid item xs={12} md={5}>
+                        <Paper variant="outlined" sx={{ p: 4, '&:hover': { boxShadow: 3 } }}>
+                            <AddCircleOutlineIcon sx={{ fontSize: 50, color: 'primary.main', mb: 2 }}/>
+                            <Typography variant="h5" gutterBottom>Create a Workout Plan</Typography>
+                            <Typography sx={{ mb: 2 }}>Design your own routine by selecting exercises and setting your goals.</Typography>
+                            <Button variant="contained" component={Link} to="/workout-plans/new">Create Plan</Button>
+                        </Paper>
+                    </Grid>
+                    <Grid item xs={12} md={5}>
+                        <Paper variant="outlined" sx={{ p: 4, '&:hover': { boxShadow: 3 } }}>
+                            <DirectionsRunIcon sx={{ fontSize: 50, color: 'secondary.main', mb: 2 }}/>
+                            <Typography variant="h5" gutterBottom>Start Your First Workout</Typography>
+                            <Typography sx={{ mb: 2 }}>Jump right in and start tracking your first training session.</Typography>
+                            <Button variant="contained" color="secondary" component={Link} to="/workouts/active">Start Session</Button>
+                        </Paper>
+                    </Grid>
+                </Grid>
+            </Box>
+        );
+    }
+
     return (
         <Box>
             <Typography variant="h4" component="h1" gutterBottom sx={{ mb: 4 }}>
@@ -76,12 +129,37 @@ const DashboardPage: React.FC = () => {
             <Grid container spacing={3}>
                 {lastSession?.workoutPlan && (
                     <Grid item xs={12}>
-                        <Card sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'primary.dark' }}>
+                        <Card
+                            sx={{
+                                p: 3,
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                background: (theme) => `linear-gradient(145deg, ${theme.palette.secondary.dark}, ${theme.palette.secondary.main})`,
+                                color: 'white',
+                                boxShadow: '0 4px 12px 0 rgba(0,0,0,0.15)',
+                                transition: 'transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out',
+                                '&:hover': {
+                                    transform: 'translateY(-5px)',
+                                    boxShadow: (theme) => `0 8px 20px 0 ${theme.palette.secondary.main}44`,
+                                }
+                            }}
+                        >
                             <Box>
-                                <Typography variant="h6">Continue where you left off?</Typography>
-                                <Typography color="text.secondary">Last workout: {lastSession.workoutPlan.name}</Typography>
+                                <Typography variant="h5" component="h2" sx={{ fontWeight: 'bold' }}>Continue Your Journey</Typography>
+                                <Typography sx={{ opacity: 0.8 }}>Your last session was: <strong>{lastSession.workoutPlan.name}</strong></Typography>
                             </Box>
-                            <Button variant="contained" color="secondary" component={Link} to={`/workouts/active/${lastSession.workoutPlan._id}`} endIcon={<ArrowForwardIcon />}>
+                            <Button
+                                variant="contained"
+                                sx={{
+                                    backgroundColor: 'white',
+                                    color: 'secondary.main',
+                                    '&:hover': { backgroundColor: 'grey.200' }
+                                }}
+                                component={Link}
+                                to={`/workouts/active/${lastSession.workoutPlan._id}`}
+                                endIcon={<ArrowForwardIcon />}
+                            >
                                 Start Again
                             </Button>
                         </Card>

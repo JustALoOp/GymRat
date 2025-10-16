@@ -11,12 +11,17 @@ const RegisterPage: React.FC = () => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (password !== confirmPassword) {
+            setError('Passwords do not match.');
+            return;
+        }
         if (password.length < 6) {
             setError('Password must be at least 6 characters long.');
             return;
@@ -87,6 +92,19 @@ const RegisterPage: React.FC = () => {
                             autoComplete="new-password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
+                            disabled={loading}
+                        />
+                        <TextField
+                            margin="normal"
+                            required
+                            fullWidth
+                            name="confirmPassword"
+                            label="Confirm Password"
+                            type="password"
+                            id="confirmPassword"
+                            autoComplete="new-password"
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
                             disabled={loading}
                         />
                         {error && (

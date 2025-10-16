@@ -5,7 +5,7 @@ const API_URL = '/exercises';
 
 export interface ExerciseInput {
     name: string;
-    muscleGroup: string;
+    type: 'weight' | 'cardio';
 }
 
 export const getExercises = async (): Promise<Exercise[]> => {
