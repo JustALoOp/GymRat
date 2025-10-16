@@ -25,7 +25,8 @@ describe('RegisterPage', () => {
 
         fireEvent.change(screen.getByLabelText(/Full Name/i), { target: { value: 'testuser' } });
         fireEvent.change(screen.getByLabelText(/Email Address/i), { target: { value: 'test@example.com' } });
-        fireEvent.change(screen.getByLabelText(/Password/i), { target: { value: 'password' } });
+        fireEvent.change(screen.getByTestId('password-input'), { target: { value: 'password' } });
+        fireEvent.change(screen.getByTestId('confirm-password-input'), { target: { value: 'password' } });
         fireEvent.click(screen.getByRole('button', { name: /Sign Up/i }));
 
         await waitFor(() => {
@@ -37,7 +38,7 @@ describe('RegisterPage', () => {
         });
     });
 
-    it('should show an error if password is too short', async () => {
+    test('should show an error if passwords do not match', async () => {
         render(
             <BrowserRouter>
                 <RegisterPage />
@@ -46,7 +47,26 @@ describe('RegisterPage', () => {
 
         fireEvent.change(screen.getByLabelText(/Full Name/i), { target: { value: 'testuser' } });
         fireEvent.change(screen.getByLabelText(/Email Address/i), { target: { value: 'test@example.com' } });
-        fireEvent.change(screen.getByLabelText(/Password/i), { target: { value: '123' } });
+        fireEvent.change(screen.getByTestId('password-input'), { target: { value: 'password123' } });
+        fireEvent.change(screen.getByTestId('confirm-password-input'), { target: { value: 'password456' } });
+        fireEvent.click(screen.getByRole('button', { name: /Sign Up/i }));
+
+        await waitFor(() => {
+            expect(screen.getByText('Passwords do not match.')).toBeInTheDocument();
+        });
+    });
+
+    test('should show an error if password is too short', async () => {
+        render(
+            <BrowserRouter>
+                <RegisterPage />
+            </BrowserRouter>
+        );
+
+        fireEvent.change(screen.getByLabelText(/Full Name/i), { target: { value: 'testuser' } });
+        fireEvent.change(screen.getByLabelText(/Email Address/i), { target: { value: 'test@example.com' } });
+        fireEvent.change(screen.getByTestId('password-input'), { target: { value: '123' } });
+        fireEvent.change(screen.getByTestId('confirm-password-input'), { target: { value: '123' } });
         fireEvent.click(screen.getByRole('button', { name: /Sign Up/i }));
 
         await waitFor(() => {

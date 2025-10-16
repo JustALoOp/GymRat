@@ -93,6 +93,7 @@ const RegisterPage: React.FC = () => {
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             disabled={loading}
+                            inputProps={{ 'data-testid': 'password-input' }}
                         />
                         <TextField
                             margin="normal"
@@ -106,6 +107,7 @@ const RegisterPage: React.FC = () => {
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
                             disabled={loading}
+                            inputProps={{ 'data-testid': 'confirm-password-input' }}
                         />
                         {error && (
                             <Alert severity="error" sx={{ mt: 2, width: '100%' }}>

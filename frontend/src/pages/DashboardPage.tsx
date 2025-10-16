@@ -135,6 +135,8 @@ const DashboardPage: React.FC = () => {
                                 display: 'flex',
                                 justifyContent: 'space-between',
                                 alignItems: 'center',
+                                flexWrap: 'wrap',
+                                gap: 2,
                                 background: (theme) => `linear-gradient(145deg, ${theme.palette.secondary.dark}, ${theme.palette.secondary.main})`,
                                 color: 'white',
                                 boxShadow: '0 4px 12px 0 rgba(0,0,0,0.15)',
@@ -177,9 +179,9 @@ const DashboardPage: React.FC = () => {
                                 <Typography variant="h6" gutterBottom>Last Workout Summary: {lastSession.workoutPlan?.name || 'Session'}</Typography>
                                 <Grid container spacing={2}>
                                     {lastSession.performedExercises.slice(0, 3).map(pEx => (
-                                        <Grid item xs={12} sm={4} key={pEx.exercise._id}>
-                                            <Paper variant="outlined" sx={{ p: 2, textAlign: 'center' }}>
-                                                <Typography variant="subtitle1" component="div">{pEx.exercise.name}</Typography>
+                                        <Grid item xs={12} md={4} key={pEx.exercise._id}>
+                                            <Paper variant="outlined" sx={{ p: 2, textAlign: 'center', height: '100%' }}>
+                                                <Typography variant="subtitle1" component="div" sx={{fontWeight: 'bold'}}>{pEx.exercise.name}</Typography>
                                                 <Typography color="text.secondary">{pEx.sets.length} sets</Typography>
                                             </Paper>
                                         </Grid>
