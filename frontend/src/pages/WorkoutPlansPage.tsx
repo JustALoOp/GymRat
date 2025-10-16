@@ -69,7 +69,7 @@ const WorkoutPlansPage: React.FC = () => {
 
             <Grid container spacing={3}>
                 {workoutPlans.map((plan) => (
-                    <Grid item xs={12} sm={6} md={6} lg={4} key={plan._id}>
+                    <Grid item xs={12} sm={6} md={6} lg={4} key={plan._id} sx={{ flexGrow: workoutPlans.length === 1 ? 1 : 0 }}>
                         <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                             <CardContent sx={{ flexGrow: 1 }}>
                                 <Typography variant="h5" component="div">

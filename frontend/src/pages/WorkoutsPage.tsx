@@ -98,7 +98,7 @@ const WorkoutsPage: React.FC = () => {
             {!loading && sessions.length > 0 && (
                 <Grid container spacing={3}>
                     {sessions.map((session) => (
-                        <Grid item xs={12} sm={6} md={6} lg={4} key={session._id}>
+                        <Grid item xs={12} sm={6} md={6} lg={4} key={session._id} sx={{ flexGrow: sessions.length === 1 ? 1 : 0 }}>
                             <SessionCard session={session} />
                         </Grid>
                     ))}
