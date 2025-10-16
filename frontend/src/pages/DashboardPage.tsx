@@ -105,7 +105,7 @@ const DashboardPage: React.FC = () => {
                             <AddCircleOutlineIcon sx={{ fontSize: 50, color: 'primary.main', mb: 2 }}/>
                             <Typography variant="h5" gutterBottom>Create a Workout Plan</Typography>
                             <Typography sx={{ mb: 2 }}>Design your own routine by selecting exercises and setting your goals.</Typography>
-                            <Button variant="contained" component={Link} to="/workout-plans?action=new">Create Plan</Button>
+                            <Button variant="contained" component={Link} to="/workout-plans?action=new" sx={{ color: 'inherit', textDecoration: 'none' }}>Create Plan</Button>
                         </Paper>
                     </Grid>
                     <Grid item xs={12} md={5}>
@@ -113,7 +113,7 @@ const DashboardPage: React.FC = () => {
                             <DirectionsRunIcon sx={{ fontSize: 50, color: 'secondary.main', mb: 2 }}/>
                             <Typography variant="h5" gutterBottom>Start Your First Workout</Typography>
                             <Typography sx={{ mb: 2 }}>Jump right in and start tracking your first training session.</Typography>
-                            <Button variant="contained" color="secondary" component={Link} to="/workouts/active">Start Session</Button>
+                            <Button variant="contained" color="secondary" component={Link} to="/workouts/active" sx={{ color: 'inherit', textDecoration: 'none' }}>Start Session</Button>
                         </Paper>
                     </Grid>
                 </Grid>
@@ -156,6 +156,7 @@ const DashboardPage: React.FC = () => {
                                 sx={{
                                     backgroundColor: 'white',
                                     color: 'secondary.main',
+                                    textDecoration: 'none',
                                     '&:hover': { backgroundColor: 'grey.200' }
                                 }}
                                 component={Link}
@@ -188,7 +189,7 @@ const DashboardPage: React.FC = () => {
                                     ))}
                                 </Grid>
                                 <Box sx={{textAlign: 'right', mt: 2}}>
-                                    <Button component={Link} to={`/workouts/${lastSession._id}`} size="small">View Full Details</Button>
+                                    <Button component={Link} to={`/workouts/${lastSession._id}`} size="small" sx={{ color: 'inherit', textDecoration: 'none' }}>View Full Details</Button>
                                 </Box>
                             </CardContent>
                         </Card>

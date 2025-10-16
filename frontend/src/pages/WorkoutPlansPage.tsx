@@ -69,7 +69,7 @@ const WorkoutPlansPage: React.FC = () => {
 
             <Grid container spacing={3}>
                 {workoutPlans.map((plan) => (
-                    <Grid item xs={12} sm={6} md={6} lg={4} key={plan._id} sx={{ flexGrow: workoutPlans.length === 1 ? 1 : 0 }}>
+                    <Grid item xs={12} sm={workoutPlans.length > 1 ? 6 : 12} md={workoutPlans.length > 1 ? 6 : 12} lg={workoutPlans.length > 1 ? 4 : 12} key={plan._id}>
                         <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                             <CardContent sx={{ flexGrow: 1 }}>
                                 <Typography variant="h5" component="div">
@@ -84,7 +84,7 @@ const WorkoutPlansPage: React.FC = () => {
                                 </Typography>
                             </CardContent>
                             <CardActions sx={{ flexWrap: 'wrap', gap: 1 }}>
-                                <Button size="small" component={Link} to={`/workout-plans/${plan._id}`} startIcon={<EditIcon />}>
+                                <Button size="small" component={Link} to={`/workout-plans/${plan._id}`} startIcon={<EditIcon />} sx={{ color: 'inherit', textDecoration: 'none' }}>
                                     View & Edit
                                 </Button>
                                 <Button size="small" color="primary" onClick={() => navigate(`/workouts/active/${plan._id}`)}>

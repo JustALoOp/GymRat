@@ -45,7 +45,7 @@ const SessionCard: React.FC<{ session: IWorkoutSession }> = ({ session }) => {
                 </Box>
             </CardContent>
             <CardActions>
-                <Button component={Link} to={`/workouts/${session._id}`} size="small">View Details</Button>
+                <Button component={Link} to={`/workouts/${session._id}`} size="small" sx={{ color: 'inherit', textDecoration: 'none' }}>View Details</Button>
             </CardActions>
         </Card>
     );
@@ -98,7 +98,7 @@ const WorkoutsPage: React.FC = () => {
             {!loading && sessions.length > 0 && (
                 <Grid container spacing={3}>
                     {sessions.map((session) => (
-                        <Grid item xs={12} sm={6} md={6} lg={4} key={session._id} sx={{ flexGrow: sessions.length === 1 ? 1 : 0 }}>
+                        <Grid item xs={12} sm={sessions.length > 1 ? 6 : 12} md={sessions.length > 1 ? 6 : 12} lg={sessions.length > 1 ? 4 : 12} key={session._id}>
                             <SessionCard session={session} />
                         </Grid>
                     ))}

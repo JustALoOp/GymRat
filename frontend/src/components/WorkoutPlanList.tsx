@@ -17,7 +17,7 @@ const WorkoutPlanList: React.FC<WorkoutPlanListProps> = ({ workoutPlans }) => {
             {workoutPlans.map((plan) => (
                 <Grid item xs={12} sm={6} md={4} key={plan._id}>
                     <Card sx={{ height: '100%' }}>
-                        <CardActionArea component={Link} to={`/workout-plans/${plan._id}`} sx={{ height: '100%' }}>
+                        <CardActionArea component={Link} to={`/workout-plans/${plan._id}`} sx={{ height: '100%', color: 'inherit', textDecoration: 'none' }}>
                             <CardContent>
                                 <Typography variant="h5" component="div">
                                     {plan.name}
