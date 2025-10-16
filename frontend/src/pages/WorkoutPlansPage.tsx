@@ -83,7 +83,7 @@ const WorkoutPlansPage: React.FC = () => {
                                     {plan.exercises.length} exercise(s)
                                 </Typography>
                             </CardContent>
-                            <CardActions>
+                            <CardActions sx={{ flexWrap: 'wrap', gap: 1 }}>
                                 <Button size="small" component={Link} to={`/workout-plans/${plan._id}`} startIcon={<EditIcon />}>
                                     View & Edit
                                 </Button>
