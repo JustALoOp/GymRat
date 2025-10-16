@@ -1,10 +1,11 @@
+const path = require('path');
 const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
 const connectDB = require('./config/db');
 
 // Load env vars
-dotenv.config();
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 // Connect to database
 if (process.env.NODE_ENV !== 'test') {

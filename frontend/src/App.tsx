@@ -1,4 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { ThemeProvider, CssBaseline } from '@mui/material';
+import theme from './theme';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -14,83 +16,86 @@ import Layout from './components/Layout';
 
 function App() {
     return (
-        <Router>
-            <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/register" element={<RegisterPage />} />
-                <Route
-                    path="/dashboard"
-                    element={
-                        <ProtectedRoute>
-                            <Layout>
-                                <DashboardPage />
-                            </Layout>
-                        </ProtectedRoute>
-                    }
-                />
-                <Route
-                    path="/workouts"
-                    element={
-                        <ProtectedRoute>
-                            <Layout>
-                                <WorkoutsPage />
-                            </Layout>
-                        </ProtectedRoute>
-                    }
-                />
-                <Route
-                    path="/workout-plans"
-                    element={
-                        <ProtectedRoute>
-                            <Layout>
-                                <WorkoutPlansPage />
-                            </Layout>
-                        </ProtectedRoute>
-                    }
-                />
-                <Route
-                    path="/workout-plans/:id"
-                    element={
-                        <ProtectedRoute>
-                            <Layout>
-                                <WorkoutPlanDetailsPage />
-                            </Layout>
-                        </ProtectedRoute>
-                    }
-                />
-                <Route
-                    path="/workouts/active/:planId"
-                    element={
-                        <ProtectedRoute>
-                            <Layout>
-                                <ActiveWorkoutPage />
-                            </Layout>
-                        </ProtectedRoute>
-                    }
-                />
-                <Route
-                    path="/stats"
-                    element={
-                        <ProtectedRoute>
-                            <Layout>
-                                <StatsPage />
-                            </Layout>
-                        </ProtectedRoute>
-                    }
-                />
-                <Route
-                    path="/manage-exercises"
-                    element={
-                        <ProtectedRoute>
-                            <Layout>
-                                <ManageExercisesPage />
-                            </Layout>
-                        </ProtectedRoute>
-                    }
-                />
-            </Routes>
-        </Router>
+        <ThemeProvider theme={theme}>
+            <CssBaseline />
+            <Router>
+                <Routes>
+                    <Route path="/" element={<HomePage />} />
+                    <Route path="/login" element={<LoginPage />} />
+                    <Route path="/register" element={<RegisterPage />} />
+                    <Route
+                        path="/dashboard"
+                        element={
+                            <ProtectedRoute>
+                                <Layout>
+                                    <DashboardPage />
+                                </Layout>
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/workouts"
+                        element={
+                            <ProtectedRoute>
+                                <Layout>
+                                    <WorkoutsPage />
+                                </Layout>
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/workout-plans"
+                        element={
+                            <ProtectedRoute>
+                                <Layout>
+                                    <WorkoutPlansPage />
+                                </Layout>
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/workout-plans/:id"
+                        element={
+                            <ProtectedRoute>
+                                <Layout>
+                                    <WorkoutPlanDetailsPage />
+                                </Layout>
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/workouts/active/:planId"
+                        element={
+                            <ProtectedRoute>
+                                <Layout>
+                                    <ActiveWorkoutPage />
+                                </Layout>
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/stats"
+                        element={
+                            <ProtectedRoute>
+                                <Layout>
+                                    <StatsPage />
+                                </Layout>
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/manage-exercises"
+                        element={
+                            <ProtectedRoute>
+                                <Layout>
+                                    <ManageExercisesPage />
+                                </Layout>
+                            </ProtectedRoute>
+                        }
+                    />
+                </Routes>
+            </Router>
+        </ThemeProvider>
     );
 }
 
