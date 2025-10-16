@@ -27,6 +27,27 @@ const theme = createTheme({
       fontWeight: 600,
     },
   },
+  components: {
+    MuiLink: {
+      styleOverrides: {
+        root: {
+          textDecoration: 'none',
+          color: 'inherit',
+        },
+      },
+    },
+    MuiButtonBase: {
+      defaultProps: {
+        disableRipple: true,
+      },
+      styleOverrides: {
+        root: {
+          textDecoration: 'none',
+          color: 'inherit',
+        },
+      },
+    },
+  },
 });
 
 export default theme;

@@ -84,7 +84,7 @@ const WorkoutPlansPage: React.FC = () => {
                                 </Typography>
                             </CardContent>
                             <CardActions sx={{ flexWrap: 'wrap', gap: 1 }}>
-                                <Button size="small" component={Link} to={`/workout-plans/${plan._id}`} startIcon={<EditIcon />} sx={{ color: 'inherit', textDecoration: 'none' }}>
+                                <Button size="small" component={Link} to={`/workout-plans/${plan._id}`} startIcon={<EditIcon />}>
                                     View & Edit
                                 </Button>
                                 <Button size="small" color="primary" onClick={() => navigate(`/workouts/active/${plan._id}`)}>

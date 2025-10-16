@@ -15,15 +15,15 @@ const HomePage: React.FC = () => {
             </Typography>
             <Box sx={{ '& > :not(style)': { m: 1 } }}>
                 {token ? (
-                    <Button variant="contained" color="primary" component={Link} to="/dashboard" size="large" sx={{ color: 'inherit', textDecoration: 'none' }}>
+                    <Button variant="contained" color="primary" component={Link} to="/dashboard" size="large">
                         Go to Dashboard
                     </Button>
                 ) : (
                     <>
-                        <Button variant="contained" color="primary" component={Link} to="/register" size="large" sx={{ color: 'inherit', textDecoration: 'none' }}>
+                        <Button variant="contained" color="primary" component={Link} to="/register" size="large">
                             Get Started
                         </Button>
-                        <Button variant="outlined" color="primary" component={Link} to="/login" size="large" sx={{ color: 'inherit', textDecoration: 'none' }}>
+                        <Button variant="outlined" color="primary" component={Link} to="/login" size="large">
                             Login
                         </Button>
                     </>

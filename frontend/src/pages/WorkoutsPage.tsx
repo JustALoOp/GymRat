@@ -45,7 +45,7 @@ const SessionCard: React.FC<{ session: IWorkoutSession }> = ({ session }) => {
                 </Box>
             </CardContent>
             <CardActions>
-                <Button component={Link} to={`/workouts/${session._id}`} size="small" sx={{ color: 'inherit', textDecoration: 'none' }}>View Details</Button>
+                <Button component={Link} to={`/workouts/${session._id}`} size="small">View Details</Button>
             </CardActions>
         </Card>
     );

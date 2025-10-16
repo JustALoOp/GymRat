@@ -48,9 +48,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             </Toolbar>
             <List>
                 {menuItems.map((item) => (
-                    <ListItem button key={item.text} component={Link} to={item.path} sx={{ textDecoration: 'none', color: 'inherit' }}>
+                    <ListItem button key={item.text} component={Link} to={item.path}>
                         <ListItemIcon>{item.icon}</ListItemIcon>
-                        <ListItemText primary={item.text} primaryTypographyProps={{ style: { textDecoration: 'none', color: 'inherit' } }} />
+                        <ListItemText primary={item.text} />
                     </ListItem>
                 ))}
             </List>
