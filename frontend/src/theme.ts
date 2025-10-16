@@ -19,7 +19,7 @@ const theme = createTheme({
     },
   },
   typography: {
-    fontFamily: 'Roboto, Arial, sans-serif',
+    fontFamily: "'Funnel Display', sans-serif",
     h4: {
       fontWeight: 700,
     },
