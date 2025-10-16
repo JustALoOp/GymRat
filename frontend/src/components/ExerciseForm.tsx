@@ -3,8 +3,6 @@ import { TextField, Button, Box, Stack, Alert, FormControl, InputLabel, Select, 
 import type { Exercise } from '../types/exercise';
 import { createExercise, updateExercise, ExerciseInput } from '../api/exercises';
 
-const muscleGroupOptions = ["Chest", "Back", "Legs", "Shoulders", "Biceps", "Triceps", "Abs", "Other"];
-
 interface ExerciseFormProps {
     onSuccess: (message: string) => void;
     onCancel: () => void;
