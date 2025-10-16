@@ -13,16 +13,16 @@ interface ExerciseFormProps {
 
 const ExerciseForm: React.FC<ExerciseFormProps> = ({ onSuccess, onCancel, exerciseToEdit }) => {
     const [name, setName] = useState('');
-    const [muscleGroup, setMuscleGroup] = useState('');
+    const [type, setType] = useState<'weight' | 'cardio'>('weight');
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         if (exerciseToEdit) {
             setName(exerciseToEdit.name);
-            setMuscleGroup(exerciseToEdit.muscleGroup);
+            setType(exerciseToEdit.type);
         } else {
             setName('');
-            setMuscleGroup('');
+            setType('weight');
         }
     }, [exerciseToEdit]);
 
@@ -30,12 +30,12 @@ const ExerciseForm: React.FC<ExerciseFormProps> = ({ onSuccess, onCancel, exerci
         e.preventDefault();
         setError(null);
 
-        if (!name.trim() || !muscleGroup) {
+        if (!name.trim()) {
             setError('All fields are required.');
             return;
         }
 
-        const exerciseData: ExerciseInput = { name, muscleGroup };
+        const exerciseData: ExerciseInput = { name, type };
 
         try {
             if (exerciseToEdit) {
@@ -63,13 +63,14 @@ const ExerciseForm: React.FC<ExerciseFormProps> = ({ onSuccess, onCancel, exerci
                     required
                 />
                 <FormControl fullWidth required>
-                    <InputLabel>Muscle Group</InputLabel>
+                    <InputLabel>Type</InputLabel>
                     <Select
-                        value={muscleGroup}
-                        label="Muscle Group"
-                        onChange={(e) => setMuscleGroup(e.target.value)}
+                        value={type}
+                        label="Type"
+                        onChange={(e) => setType(e.target.value as 'weight' | 'cardio')}
                     >
-                        {muscleGroupOptions.map(group => <MenuItem key={group} value={group}>{group}</MenuItem>)}
+                        <MenuItem value="weight">Weight</MenuItem>
+                        <MenuItem value="cardio">Cardio</MenuItem>
                     </Select>
                 </FormControl>
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, pt: 2 }}>
