@@ -43,10 +43,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
     const drawerContent = (
         <div>
-            <Toolbar sx={{ justifyContent: 'center' }}>
-                <Typography variant="h6" noWrap component="div">
-                    GymRat
-                </Typography>
+            <Toolbar sx={{ justifyContent: 'center', p: 2 }}>
+                <img src="/logo.svg" alt="GymRat Logo" style={{ height: 40 }} />
             </Toolbar>
             <List>
                 {menuItems.map((item) => (
