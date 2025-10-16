@@ -3,7 +3,7 @@ import {
     Typography, Button, Box, CircularProgress, Alert, Snackbar, Grid, Card, CardContent,
     CardActions, Dialog, DialogTitle, DialogContent, Fab
 } from '@mui/material';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import AddIcon from '@mui/icons-material/Add';
 import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
 import EditIcon from '@mui/icons-material/Edit';
@@ -18,6 +18,13 @@ const WorkoutPlansPage: React.FC = () => {
     const [isFormOpen, setFormOpen] = useState(false);
     const [snackbar, setSnackbar] = useState<{ open: boolean, message: string, severity: 'success' | 'error' }>({ open: false, message: '', severity: 'success' });
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+
+    useEffect(() => {
+        if (searchParams.get('action') === 'new') {
+            setFormOpen(true);
+        }
+    }, [searchParams]);
 
     const fetchWorkoutPlans = useCallback(async () => {
         try {

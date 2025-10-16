@@ -7,28 +7,10 @@ const ExerciseSchema = new mongoose.Schema({
         trim: true,
         unique: true,
     },
-    description: {
+    type: {
         type: String,
-        required: [true, 'Please add a description'],
-    },
-    muscleGroup: {
-        type: String,
-        required: [true, 'Please add a muscle group'],
-        enum: [
-            'Chest',
-            'Back',
-            'Legs',
-            'Shoulders',
-            'Biceps',
-            'Triceps',
-            'Abs',
-            'Other',
-        ],
-    },
-    user: {
-        type: mongoose.Schema.ObjectId,
-        ref: 'User',
-        required: false,
+        required: [true, 'Please add an exercise type'],
+        enum: ['weight', 'cardio'],
     },
 });
 

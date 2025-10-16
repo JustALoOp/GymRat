@@ -105,7 +105,7 @@ const DashboardPage: React.FC = () => {
                             <AddCircleOutlineIcon sx={{ fontSize: 50, color: 'primary.main', mb: 2 }}/>
                             <Typography variant="h5" gutterBottom>Create a Workout Plan</Typography>
                             <Typography sx={{ mb: 2 }}>Design your own routine by selecting exercises and setting your goals.</Typography>
-                            <Button variant="contained" component={Link} to="/workout-plans/new">Create Plan</Button>
+                            <Button variant="contained" component={Link} to="/workout-plans?action=new">Create Plan</Button>
                         </Paper>
                     </Grid>
                     <Grid item xs={12} md={5}>
