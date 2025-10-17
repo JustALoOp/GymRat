@@ -28,22 +28,11 @@ const theme = createTheme({
     },
   },
   components: {
-    MuiLink: {
+    MuiCssBaseline: {
       styleOverrides: {
-        root: {
-          textDecoration: 'none',
+        a: {
           color: 'inherit',
-        },
-      },
-    },
-    MuiButtonBase: {
-      defaultProps: {
-        disableRipple: true,
-      },
-      styleOverrides: {
-        root: {
           textDecoration: 'none',
-          color: 'inherit',
         },
       },
     },
