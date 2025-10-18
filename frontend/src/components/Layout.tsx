@@ -42,7 +42,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     ];
 
     const drawerContent = (
-        <div>
+        <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
             <Toolbar sx={{ justifyContent: 'center', p: 2 }}>
                 <img src="/logo.svg" alt="GymRat Logo" style={{ height: 50 }} />
             </Toolbar>
@@ -61,7 +61,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                     <ListItemText primary="Logout" />
                 </ListItem>
             </List>
-        </div>
+        </Box>
     );
 
     return (

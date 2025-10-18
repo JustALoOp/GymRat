@@ -1,27 +1,24 @@
 # Dependencies
 /node_modules
-
-# Production
-/build
-/dist
+/frontend/node_modules
 
 # Logs
-logs
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
-server.log
 
-# Misc
-.DS_Store
+# Environment variables
 .env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
 
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+# Build artifacts
+/frontend/dist
+/build
+
+# Scratch directory
+jules-scratch/
