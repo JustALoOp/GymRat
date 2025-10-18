@@ -36,7 +36,7 @@ const ActiveWorkoutPage: React.FC = () => {
 
     useEffect(() => {
         if (!planId) {
-            setError('Plan ID is missing.');
+            setError('Brak ID planu.');
             setIsLoading(false);
             return;
         }
@@ -55,7 +55,7 @@ const ActiveWorkoutPage: React.FC = () => {
                 }));
                 setTrackedExercises(initialTracker);
             } catch (err) {
-                setError('Failed to fetch workout plan details.');
+                setError('Nie udało się wczytać szczegółów planu treningowego.');
             } finally {
                 setIsLoading(false);
             }
@@ -94,15 +94,15 @@ const ActiveWorkoutPage: React.FC = () => {
         };
         try {
             await createWorkoutSession(sessionData);
-            navigate('/workouts', { state: { message: 'Workout session saved!' } });
+            navigate('/workouts', { state: { message: 'Sesja treningowa została zapisana!' } });
         } catch (err) {
-            setError('Failed to save workout session.');
+            setError('Nie udało się zapisać sesji treningowej.');
         }
     };
 
     if (isLoading) return <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}><CircularProgress /></Box>;
     if (error) return <Alert severity="error">{error}</Alert>;
-    if (!workoutPlan || trackedExercises.length === 0) return <Typography>Workout plan not found or is empty.</Typography>;
+    if (!workoutPlan || trackedExercises.length === 0) return <Typography>Nie znaleziono planu treningowego lub jest on pusty.</Typography>;
 
     const currentExercise = trackedExercises[activeStep];
 
@@ -122,10 +122,10 @@ const ActiveWorkoutPage: React.FC = () => {
                         <List>
                             {currentExercise.sets.map((set, setIndex) => (
                                 <ListItem key={setIndex} divider>
-                                    <ListItemText primary={`Set ${setIndex + 1}`} />
+                                    <ListItemText primary={`Seria ${setIndex + 1}`} />
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                        <TextField label="Weight (kg)" variant="outlined" size="small" value={set.weight} onChange={(e) => handleSetChange(setIndex, 'weight', e.target.value)} sx={{ width: '100px' }} />
-                                        <TextField label="Reps" variant="outlined" size="small" value={set.reps} onChange={(e) => handleSetChange(setIndex, 'reps', e.target.value)} sx={{ width: '100px' }} />
+                                        <TextField label="Ciężar (kg)" variant="outlined" size="small" value={set.weight} onChange={(e) => handleSetChange(setIndex, 'weight', e.target.value)} sx={{ width: '100px' }} />
+                                        <TextField label="Powtórzenia" variant="outlined" size="small" value={set.reps} onChange={(e) => handleSetChange(setIndex, 'reps', e.target.value)} sx={{ width: '100px' }} />
                                         <IconButton color={set.completed ? 'success' : 'default'} onClick={() => toggleSetCompletion(setIndex)}>
                                             {set.completed ? <CheckCircleIcon /> : <RadioButtonUncheckedIcon />}
                                         </IconButton>
@@ -137,18 +137,18 @@ const ActiveWorkoutPage: React.FC = () => {
                 </Card>
             ) : (
                 <Box sx={{ textAlign: 'center', my: 4 }}>
-                    <Typography variant="h5">Workout Complete!</Typography>
-                    <Typography color="text.secondary">Ready to save your session?</Typography>
+                    <Typography variant="h5">Trening ukończony!</Typography>
+                    <Typography color="text.secondary">Gotowy, aby zapisać swoją sesję?</Typography>
                 </Box>
             )}
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3 }}>
-                <Button disabled={activeStep === 0} onClick={handleBack}>Back</Button>
+                <Button disabled={activeStep === 0} onClick={handleBack}>Wróć</Button>
                 {activeStep < trackedExercises.length - 1 ? (
-                    <Button variant="contained" onClick={handleNext}>Next Exercise</Button>
+                    <Button variant="contained" onClick={handleNext}>Następne ćwiczenie</Button>
                 ) : (
                     <Button variant="contained" color="primary" onClick={handleFinishWorkout} disabled={isSaving}>
-                        {isSaving ? <CircularProgress size={24}/> : 'Finish & Save Workout'}
+                        {isSaving ? <CircularProgress size={24}/> : 'Zakończ i zapisz trening'}
                     </Button>
                 )}
             </Box>

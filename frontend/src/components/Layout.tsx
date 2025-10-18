@@ -34,11 +34,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     };
 
     const menuItems = [
-        { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
-        { text: 'Workouts', icon: <FitnessCenterIcon />, path: '/workouts' },
-        { text: 'Workout Plans', icon: <EventNoteIcon />, path: '/workout-plans' },
-        { text: 'Statistics', icon: <BarChartIcon />, path: '/stats' },
-        { text: 'Manage Exercises', icon: <SettingsIcon />, path: '/manage-exercises' },
+        { text: 'Panel', icon: <DashboardIcon />, path: '/dashboard' },
+        { text: 'Treningi', icon: <FitnessCenterIcon />, path: '/workouts' },
+        { text: 'Plany treningowe', icon: <EventNoteIcon />, path: '/workout-plans' },
+        { text: 'Statystyki', icon: <BarChartIcon />, path: '/stats' },
+        { text: 'Zarządzaj ćwiczeniami', icon: <SettingsIcon />, path: '/manage-exercises' },
     ];
 
     const drawerContent = (
@@ -58,7 +58,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             <List>
                 <ListItem button onClick={handleLogout}>
                     <ListItemIcon><ExitToAppIcon /></ListItemIcon>
-                    <ListItemText primary="Logout" />
+                    <ListItemText primary="Wyloguj" />
                 </ListItem>
             </List>
         </Box>
@@ -87,7 +87,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                         </IconButton>
                     )}
                     <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-                        {menuItems.find(item => window.location.pathname.startsWith(item.path))?.text || 'Dashboard'}
+                        {menuItems.find(item => window.location.pathname.startsWith(item.path))?.text || 'Panel'}
                     </Typography>
                 </Toolbar>
             </AppBar>

@@ -20,12 +20,12 @@ const SessionCard: React.FC<{ session: IWorkoutSession }> = ({ session }) => {
         <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
             <CardContent sx={{ flexGrow: 1 }}>
                 <Typography variant="h6" component="h2" gutterBottom>
-                    {session.workoutPlan?.name || 'Workout Session'}
+                    {session.workoutPlan?.name || 'Sesja treningowa'}
                 </Typography>
                 <Box sx={{ display: 'flex', alignItems: 'center', color: 'text.secondary', mb: 2 }}>
                     <CalendarTodayIcon fontSize="small" sx={{ mr: 1 }} />
                     <Typography variant="body2">
-                        {new Date(session.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                        {new Date(session.date).toLocaleDateString('pl-PL', { year: 'numeric', month: 'long', day: 'numeric' })}
                     </Typography>
                 </Box>
                 <Divider sx={{ my: 1 }} />
@@ -34,18 +34,18 @@ const SessionCard: React.FC<{ session: IWorkoutSession }> = ({ session }) => {
                     <Typography variant="body2" component="span" sx={{ fontWeight: 'bold' }}>
                         {totalVolume.toLocaleString()} kg
                     </Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ ml: 0.5 }}>- Total Volume</Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ ml: 0.5 }}>- Całkowita objętość</Typography>
                 </Box>
                 <Box sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
                     <FitnessCenterIcon fontSize="small" sx={{ mr: 1, color: 'info.main' }} />
                     <Typography variant="body2" component="span" sx={{ fontWeight: 'bold' }}>
                         {session.performedExercises.length}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ ml: 0.5 }}>- Exercise(s) Completed</Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ ml: 0.5 }}>- Ukończone ćwiczenia</Typography>
                 </Box>
             </CardContent>
             <CardActions>
-                <Button component={Link} to={`/workouts/${session._id}`} size="small">View Details</Button>
+                <Button component={Link} to={`/workouts/${session._id}`} size="small">Zobacz szczegóły</Button>
             </CardActions>
         </Card>
     );
@@ -73,7 +73,7 @@ const WorkoutsPage: React.FC = () => {
                 const data = await getWorkoutSessions();
                 setSessions(data.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
             } catch (err) {
-                setError('Failed to fetch workout sessions.');
+                setError('Nie udało się wczytać sesji treningowych.');
             } finally {
                 setLoading(false);
             }
@@ -90,8 +90,8 @@ const WorkoutsPage: React.FC = () => {
 
             {!loading && !error && sessions.length === 0 && (
                 <Box sx={{ textAlign: 'center', mt: 4 }}>
-                    <Typography variant="h6">No workout history found.</Typography>
-                    <Typography color="text.secondary">Complete a session to see it here!</Typography>
+                    <Typography variant="h6">Nie znaleziono historii treningów.</Typography>
+                    <Typography color="text.secondary">Ukończ sesję, aby zobaczyć ją tutaj!</Typography>
                 </Box>
             )}
 

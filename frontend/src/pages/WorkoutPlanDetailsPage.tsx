@@ -28,7 +28,7 @@ const WorkoutPlanDetailsPage: React.FC = () => {
 
     const fetchWorkoutPlan = useCallback(async () => {
         if (!id) {
-            setError('Plan ID is missing.');
+            setError('Brak ID planu.');
             setIsLoading(false);
             return;
         }
@@ -41,7 +41,7 @@ const WorkoutPlanDetailsPage: React.FC = () => {
             setWorkoutPlan(plan);
             setAvailableExercises(exercises);
         } catch (err) {
-            setError('Failed to fetch page data.');
+            setError('Nie udało się wczytać danych strony.');
         } finally {
             setIsLoading(false);
         }
@@ -73,7 +73,7 @@ const WorkoutPlanDetailsPage: React.FC = () => {
         } else {
             const exerciseDetails = availableExercises.find(ex => ex._id === data.exercise);
             if (!exerciseDetails) {
-                setSnackbar({ open: true, message: 'Selected exercise not found.', severity: 'error' });
+                setSnackbar({ open: true, message: 'Nie znaleziono wybranego ćwiczenia.', severity: 'error' });
                 return;
             }
             const newExercise = { ...data, exercise: exerciseDetails };
@@ -88,16 +88,16 @@ const WorkoutPlanDetailsPage: React.FC = () => {
 
         try {
             await updateWorkoutPlan(id, { exercises: exercisesToSubmit });
-            setSnackbar({ open: true, message: 'Plan updated successfully!', severity: 'success' });
+            setSnackbar({ open: true, message: 'Plan został pomyślnie zaktualizowany!', severity: 'success' });
             handleCloseForm();
             fetchWorkoutPlan();
         } catch (err) {
-            setSnackbar({ open: true, message: 'Failed to update plan.', severity: 'error' });
+            setSnackbar({ open: true, message: 'Nie udało się zaktualizować planu.', severity: 'error' });
         }
     };
 
     const handleRemoveExercise = async (exerciseId: string) => {
-        if (!id || !workoutPlan || !window.confirm('Are you sure you want to remove this exercise?')) return;
+        if (!id || !workoutPlan || !window.confirm('Czy na pewno chcesz usunąć to ćwiczenie?')) return;
 
         const updatedExercises = workoutPlan.exercises.filter(ex => ex.exercise._id !== exerciseId);
         const exercisesToSubmit = updatedExercises.map(ex => ({
@@ -108,26 +108,26 @@ const WorkoutPlanDetailsPage: React.FC = () => {
 
         try {
             await updateWorkoutPlan(id, { exercises: exercisesToSubmit });
-            setSnackbar({ open: true, message: 'Exercise removed successfully!', severity: 'success' });
+            setSnackbar({ open: true, message: 'Ćwiczenie zostało pomyślnie usunięte!', severity: 'success' });
             fetchWorkoutPlan();
         } catch (err) {
-            setSnackbar({ open: true, message: 'Failed to remove exercise.', severity: 'error' });
+            setSnackbar({ open: true, message: 'Nie udało się usunąć ćwiczenia.', severity: 'error' });
         }
     };
 
     const handleDeletePlan = async () => {
-        if (!id || !window.confirm('Are you sure you want to delete this entire workout plan?')) return;
+        if (!id || !window.confirm('Czy na pewno chcesz usunąć cały ten plan treningowy?')) return;
         try {
             await deleteWorkoutPlan(id);
             navigate('/workout-plans');
         } catch (err) {
-            setError('Failed to delete workout plan.');
+            setError('Nie udało się usunąć planu treningowego.');
         }
     };
 
     if (isLoading) return <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}><CircularProgress /></Box>;
     if (error) return <Alert severity="error">{error}</Alert>;
-    if (!workoutPlan) return <Typography>Workout plan not found.</Typography>;
+    if (!workoutPlan) return <Typography>Nie znaleziono planu treningowego.</Typography>;
 
     return (
         <Paper sx={{ p: { xs: 2, sm: 3, md: 4 } }}>
@@ -138,16 +138,16 @@ const WorkoutPlanDetailsPage: React.FC = () => {
                 </Box>
                 <Box sx={{ display: 'flex', gap: 1, flexShrink: 0 }}>
                     <Button variant="outlined" color="error" onClick={handleDeletePlan} startIcon={<DeleteIcon />}>
-                        Delete Plan
+                        Usuń plan
                     </Button>
                 </Box>
             </Box>
             <Divider sx={{ my: 3 }} />
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                <Typography variant="h5" component="h2">Exercises</Typography>
+                <Typography variant="h5" component="h2">Ćwiczenia</Typography>
                 <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={() => handleOpenForm()}>
-                    Add Exercise
+                    Dodaj ćwiczenie
                 </Button>
             </Box>
 
@@ -160,19 +160,19 @@ const WorkoutPlanDetailsPage: React.FC = () => {
                         </>
                     } sx={{ mb: 1, bgcolor: 'background.default', borderRadius: 2, p: 2 }}>
                         <ListItemAvatar><Avatar><FitnessCenterIcon /></Avatar></ListItemAvatar>
-                        <ListItemText primary={planExercise.exercise.name} secondary={`Sets: ${planExercise.sets} | Reps: ${planExercise.reps}`} />
+                        <ListItemText primary={planExercise.exercise.name} secondary={`Serie: ${planExercise.sets} | Powtórzenia: ${planExercise.reps}`} />
                     </ListItem>
                 ))}
             </List>
 
             {workoutPlan.exercises.length === 0 && (
                 <Typography sx={{ textAlign: 'center', my: 4 }} color="text.secondary">
-                    This plan has no exercises yet. Add one to get started!
+                    Ten plan nie ma jeszcze żadnych ćwiczeń. Dodaj je, aby rozpocząć!
                 </Typography>
             )}
 
             <Dialog open={isFormOpen} onClose={handleCloseForm} maxWidth="sm" fullWidth>
-                <DialogTitle>{exerciseToEdit ? 'Edit Exercise' : 'Add New Exercise'}</DialogTitle>
+                <DialogTitle>{exerciseToEdit ? 'Edytuj ćwiczenie' : 'Dodaj nowe ćwiczenie'}</DialogTitle>
                 <DialogContent>
                     <WorkoutPlanExerciseForm
                         onSubmit={handleFormSubmit}
@@ -191,7 +191,7 @@ const WorkoutPlanDetailsPage: React.FC = () => {
 
             <Fab color="primary" variant="extended" aria-label="start workout" sx={{ position: 'fixed', bottom: 24, right: 24 }} onClick={() => navigate(`/workouts/active/${workoutPlan._id}`)}>
                 <PlayArrowIcon sx={{ mr: 1 }} />
-                Start Workout
+                Rozpocznij trening
             </Fab>
         </Paper>
     );

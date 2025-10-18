@@ -19,11 +19,11 @@ const RegisterPage: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (password !== confirmPassword) {
-            setError('Passwords do not match.');
+            setError('Hasła nie są zgodne.');
             return;
         }
         if (password.length < 6) {
-            setError('Password must be at least 6 characters long.');
+            setError('Hasło musi mieć co najmniej 6 znaków.');
             return;
         }
         setError(null);
@@ -33,9 +33,9 @@ const RegisterPage: React.FC = () => {
             navigate('/login');
         } catch (err) {
             if (isAxiosError(err) && err.response) {
-                setError(err.response.data.error || 'An unexpected error occurred during registration.');
+                setError(err.response.data.error || 'Wystąpił nieoczekiwany błąd podczas rejestracji.');
             } else {
-                setError('An unexpected error occurred during registration.');
+                setError('Wystąpił nieoczekiwany błąd podczas rejestracji.');
             }
         } finally {
             setLoading(false);
@@ -52,7 +52,7 @@ const RegisterPage: React.FC = () => {
                             GymRat
                         </Typography>
                         <Typography component="h2" variant="h5" sx={{ mt: 2 }}>
-                            Sign Up
+                            Zarejestruj się
                         </Typography>
                     </Box>
                     <Box component="form" onSubmit={handleSubmit}>
@@ -61,7 +61,7 @@ const RegisterPage: React.FC = () => {
                             required
                             fullWidth
                             id="name"
-                            label="Full Name"
+                            label="Imię i nazwisko"
                             name="name"
                             autoComplete="name"
                             autoFocus
@@ -74,7 +74,7 @@ const RegisterPage: React.FC = () => {
                             required
                             fullWidth
                             id="email"
-                            label="Email Address"
+                            label="Adres email"
                             name="email"
                             autoComplete="email"
                             value={email}
@@ -86,7 +86,7 @@ const RegisterPage: React.FC = () => {
                             required
                             fullWidth
                             name="password"
-                            label="Password"
+                            label="Hasło"
                             type="password"
                             id="password"
                             autoComplete="new-password"
@@ -100,7 +100,7 @@ const RegisterPage: React.FC = () => {
                             required
                             fullWidth
                             name="confirmPassword"
-                            label="Confirm Password"
+                            label="Potwierdź hasło"
                             type="password"
                             id="confirmPassword"
                             autoComplete="new-password"
@@ -121,12 +121,12 @@ const RegisterPage: React.FC = () => {
                             sx={{ mt: 3, mb: 2, py: 1.5 }}
                             disabled={loading}
                         >
-                            {loading ? <CircularProgress size={24} color="inherit" /> : 'Sign Up'}
+                            {loading ? <CircularProgress size={24} color="inherit" /> : 'Zarejestruj się'}
                         </Button>
                         <Grid container justifyContent="flex-end">
                             <Grid item>
                                 <Link component={RouterLink} to="/login" variant="body2">
-                                    Already have an account? Sign in
+                                    Masz już konto? Zaloguj się
                                 </Link>
                             </Grid>
                         </Grid>

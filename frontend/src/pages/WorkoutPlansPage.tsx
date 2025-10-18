@@ -32,8 +32,8 @@ const WorkoutPlansPage: React.FC = () => {
             const plans = await getWorkoutPlans();
             setWorkoutPlans(plans);
         } catch (err) {
-            setError('Failed to fetch workout plans.');
-            setSnackbar({ open: true, message: 'Failed to fetch workout plans.', severity: 'error' });
+            setError('Nie udało się wczytać planów treningowych.');
+            setSnackbar({ open: true, message: 'Nie udało się wczytać planów treningowych.', severity: 'error' });
         } finally {
             setIsLoading(false);
         }
@@ -46,12 +46,12 @@ const WorkoutPlansPage: React.FC = () => {
     const handleCreatePlan = async (data: WorkoutPlanInput) => {
         try {
             await createWorkoutPlan(data);
-            setSnackbar({ open: true, message: 'Workout plan created successfully!', severity: 'success' });
+            setSnackbar({ open: true, message: 'Plan treningowy został pomyślnie utworzony!', severity: 'success' });
             setFormOpen(false);
             fetchWorkoutPlans(); // Refresh the list
         } catch (err) {
-            setError('Failed to create workout plan.');
-            setSnackbar({ open: true, message: 'Failed to create workout plan.', severity: 'error' });
+            setError('Nie udało się utworzyć planu treningowego.');
+            setSnackbar({ open: true, message: 'Nie udało się utworzyć planu treningowego.', severity: 'error' });
         }
     };
 
@@ -76,19 +76,19 @@ const WorkoutPlansPage: React.FC = () => {
                                     {plan.name}
                                 </Typography>
                                 <Typography sx={{ mt: 1.5 }} color="text.secondary">
-                                    {plan.description || 'No description available.'}
+                                    {plan.description || 'Brak opisu.'}
                                 </Typography>
                                 <Typography sx={{ mt: 2 }} variant="body2">
                                     <FitnessCenterIcon sx={{ verticalAlign: 'middle', mr: 1 }} />
-                                    {plan.exercises.length} exercise(s)
+                                    Liczba ćwiczeń: {plan.exercises.length}
                                 </Typography>
                             </CardContent>
                             <CardActions sx={{ flexWrap: 'wrap', gap: 1 }}>
                                 <Button size="small" component={Link} to={`/workout-plans/${plan._id}`} startIcon={<EditIcon />}>
-                                    View & Edit
+                                    Zobacz i edytuj
                                 </Button>
                                 <Button size="small" color="primary" onClick={() => navigate(`/workouts/active/${plan._id}`)}>
-                                    Start Workout
+                                    Rozpocznij trening
                                 </Button>
                             </CardActions>
                         </Card>
@@ -98,9 +98,9 @@ const WorkoutPlansPage: React.FC = () => {
 
             { !isLoading && workoutPlans.length === 0 && !error && (
                  <Box sx={{ textAlign: 'center', mt: 4 }}>
-                    <Typography variant="h6">No workout plans found.</Typography>
-                    <Typography color="text.secondary">Create one to get started!</Typography>
-                    <Button variant="contained" sx={{ mt: 2 }} onClick={() => setFormOpen(true)}>Create Your First Plan</Button>
+                    <Typography variant="h6">Nie znaleziono planów treningowych.</Typography>
+                    <Typography color="text.secondary">Stwórz plan, aby rozpocząć!</Typography>
+                    <Button variant="contained" sx={{ mt: 2 }} onClick={() => setFormOpen(true)}>Stwórz swój pierwszy plan</Button>
                 </Box>
             )}
 
@@ -114,7 +114,7 @@ const WorkoutPlansPage: React.FC = () => {
             </Fab>
 
             <Dialog open={isFormOpen} onClose={() => setFormOpen(false)} maxWidth="sm" fullWidth>
-                <DialogTitle>Create New Workout Plan</DialogTitle>
+                <DialogTitle>Stwórz nowy plan treningowy</DialogTitle>
                 <DialogContent>
                     <WorkoutPlanForm
                         onSubmit={handleCreatePlan}

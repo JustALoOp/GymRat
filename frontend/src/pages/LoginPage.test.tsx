@@ -19,9 +19,9 @@ describe('LoginPage', () => {
             </BrowserRouter>
         );
 
-        fireEvent.change(screen.getByLabelText(/Email Address/i), { target: { value: 'test@example.com' } });
-        fireEvent.change(screen.getByLabelText(/Password/i), { target: { value: 'password' } });
-        fireEvent.click(screen.getByRole('button', { name: /Sign In/i }));
+        fireEvent.change(screen.getByLabelText(/Adres email/i), { target: { value: 'test@example.com' } });
+        fireEvent.change(screen.getByLabelText(/Hasło/i), { target: { value: 'password' } });
+        fireEvent.click(screen.getByRole('button', { name: /Zaloguj się/i }));
 
         await waitFor(() => {
             expect(login).toHaveBeenCalledWith({

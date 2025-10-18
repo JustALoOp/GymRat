@@ -23,11 +23,11 @@ describe('RegisterPage', () => {
             </BrowserRouter>
         );
 
-        fireEvent.change(screen.getByLabelText(/Full Name/i), { target: { value: 'testuser' } });
-        fireEvent.change(screen.getByLabelText(/Email Address/i), { target: { value: 'test@example.com' } });
+        fireEvent.change(screen.getByLabelText(/Imię i nazwisko/i), { target: { value: 'testuser' } });
+        fireEvent.change(screen.getByLabelText(/Adres email/i), { target: { value: 'test@example.com' } });
         fireEvent.change(screen.getByTestId('password-input'), { target: { value: 'password' } });
         fireEvent.change(screen.getByTestId('confirm-password-input'), { target: { value: 'password' } });
-        fireEvent.click(screen.getByRole('button', { name: /Sign Up/i }));
+        fireEvent.click(screen.getByRole('button', { name: /Zarejestruj się/i }));
 
         await waitFor(() => {
             expect(register).toHaveBeenCalledWith({
@@ -45,14 +45,14 @@ describe('RegisterPage', () => {
             </BrowserRouter>
         );
 
-        fireEvent.change(screen.getByLabelText(/Full Name/i), { target: { value: 'testuser' } });
-        fireEvent.change(screen.getByLabelText(/Email Address/i), { target: { value: 'test@example.com' } });
+        fireEvent.change(screen.getByLabelText(/Imię i nazwisko/i), { target: { value: 'testuser' } });
+        fireEvent.change(screen.getByLabelText(/Adres email/i), { target: { value: 'test@example.com' } });
         fireEvent.change(screen.getByTestId('password-input'), { target: { value: 'password123' } });
         fireEvent.change(screen.getByTestId('confirm-password-input'), { target: { value: 'password456' } });
-        fireEvent.click(screen.getByRole('button', { name: /Sign Up/i }));
+        fireEvent.click(screen.getByRole('button', { name: /Zarejestruj się/i }));
 
         await waitFor(() => {
-            expect(screen.getByText('Passwords do not match.')).toBeInTheDocument();
+            expect(screen.getByText('Hasła nie są zgodne.')).toBeInTheDocument();
         });
     });
 
@@ -63,14 +63,14 @@ describe('RegisterPage', () => {
             </BrowserRouter>
         );
 
-        fireEvent.change(screen.getByLabelText(/Full Name/i), { target: { value: 'testuser' } });
-        fireEvent.change(screen.getByLabelText(/Email Address/i), { target: { value: 'test@example.com' } });
+        fireEvent.change(screen.getByLabelText(/Imię i nazwisko/i), { target: { value: 'testuser' } });
+        fireEvent.change(screen.getByLabelText(/Adres email/i), { target: { value: 'test@example.com' } });
         fireEvent.change(screen.getByTestId('password-input'), { target: { value: '123' } });
         fireEvent.change(screen.getByTestId('confirm-password-input'), { target: { value: '123' } });
-        fireEvent.click(screen.getByRole('button', { name: /Sign Up/i }));
+        fireEvent.click(screen.getByRole('button', { name: /Zarejestruj się/i }));
 
         await waitFor(() => {
-            expect(screen.getByText('Password must be at least 6 characters long.')).toBeInTheDocument();
+            expect(screen.getByText('Hasło musi mieć co najmniej 6 znaków.')).toBeInTheDocument();
         });
 
         expect(register).not.toHaveBeenCalled();

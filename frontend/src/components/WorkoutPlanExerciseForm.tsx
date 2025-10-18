@@ -26,7 +26,7 @@ const WorkoutPlanExerciseForm: React.FC<WorkoutPlanExerciseFormProps> = ({ onSub
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (!formData.exercise) {
-            setError("Please select an exercise.");
+            setError("Proszę wybrać ćwiczenie.");
             return;
         }
         setError(null);
@@ -38,11 +38,11 @@ const WorkoutPlanExerciseForm: React.FC<WorkoutPlanExerciseFormProps> = ({ onSub
             <Stack spacing={3}>
                 {error && <Alert severity="error">{error}</Alert>}
                 <FormControl fullWidth required>
-                    <InputLabel>Exercise</InputLabel>
+                    <InputLabel>Ćwiczenie</InputLabel>
                     <Select
                         value={formData.exercise}
                         onChange={(e) => handleChange('exercise', e.target.value)}
-                        label="Exercise"
+                        label="Ćwiczenie"
                     >
                         {availableExercises.map((ex) => (
                             <MenuItem key={ex._id} value={ex._id}>{ex.name}</MenuItem>
@@ -50,7 +50,7 @@ const WorkoutPlanExerciseForm: React.FC<WorkoutPlanExerciseFormProps> = ({ onSub
                     </Select>
                 </FormControl>
                 <TextField
-                    label="Sets"
+                    label="Serie"
                     type="number"
                     value={formData.sets}
                     onChange={(e) => handleChange('sets', parseInt(e.target.value, 10))}
@@ -58,16 +58,16 @@ const WorkoutPlanExerciseForm: React.FC<WorkoutPlanExerciseFormProps> = ({ onSub
                     required
                 />
                 <TextField
-                    label="Reps"
+                    label="Powtórzenia"
                     value={formData.reps}
                     onChange={(e) => handleChange('reps', e.target.value)}
                     fullWidth
                     required
                 />
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, pt: 2 }}>
-                    <Button onClick={onCancel} color="inherit">Cancel</Button>
+                    <Button onClick={onCancel} color="inherit">Anuluj</Button>
                     <Button type="submit" variant="contained">
-                        {initialData ? 'Update Exercise' : 'Add Exercise'}
+                        {initialData ? 'Zaktualizuj ćwiczenie' : 'Dodaj ćwiczenie'}
                     </Button>
                 </Box>
             </Stack>

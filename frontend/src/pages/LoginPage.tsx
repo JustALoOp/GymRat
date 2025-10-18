@@ -24,9 +24,9 @@ const LoginPage: React.FC = () => {
             navigate('/dashboard');
         } catch (err) {
             if (isAxiosError(err) && err.response) {
-                setError(err.response.data.error || 'An unexpected error occurred.');
+                setError(err.response.data.error || 'Wystąpił nieoczekiwany błąd.');
             } else {
-                setError('An unexpected error occurred.');
+                setError('Wystąpił nieoczekiwany błąd.');
             }
         } finally {
             setLoading(false);
@@ -43,7 +43,7 @@ const LoginPage: React.FC = () => {
                             GymRat
                         </Typography>
                         <Typography component="h2" variant="h5" sx={{ mt: 2 }}>
-                            Sign In
+                            Zaloguj się
                         </Typography>
                     </Box>
                     <Box component="form" onSubmit={handleSubmit}>
@@ -52,7 +52,7 @@ const LoginPage: React.FC = () => {
                             required
                             fullWidth
                             id="email"
-                            label="Email Address"
+                            label="Adres email"
                             name="email"
                             autoComplete="email"
                             autoFocus
@@ -65,7 +65,7 @@ const LoginPage: React.FC = () => {
                             required
                             fullWidth
                             name="password"
-                            label="Password"
+                            label="Hasło"
                             type="password"
                             id="password"
                             autoComplete="current-password"
@@ -85,12 +85,12 @@ const LoginPage: React.FC = () => {
                             sx={{ mt: 3, mb: 2, py: 1.5 }}
                             disabled={loading}
                         >
-                            {loading ? <CircularProgress size={24} color="inherit" /> : 'Sign In'}
+                            {loading ? <CircularProgress size={24} color="inherit" /> : 'Zaloguj się'}
                         </Button>
                         <Grid container justifyContent="flex-end">
                             <Grid item>
                                 <Link component={RouterLink} to="/register" variant="body2">
-                                    {"Don't have an account? Sign Up"}
+                                    {"Nie masz konta? Zarejestruj się"}
                                 </Link>
                             </Grid>
                         </Grid>

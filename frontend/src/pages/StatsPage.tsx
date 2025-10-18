@@ -43,12 +43,12 @@ const StatsPage: React.FC = () => {
                         setSelectedExerciseId(uniqueExercises[0]._id);
                     }
                 } catch (err) {
-                    setError('Failed to fetch dashboard data.');
+                    setError('Nie udało się wczytać danych statystyk.');
                 } finally {
                     setLoading(false);
                 }
             } else {
-                setError('Authentication token not found. Please log in.');
+                setError('Nie znaleziono tokenu uwierzytelniającego. Proszę się zalogować.');
                 setLoading(false);
             }
         };
@@ -71,21 +71,21 @@ const StatsPage: React.FC = () => {
     return (
         <Box>
             <Typography variant="h4" component="h1" gutterBottom>
-                Statistics
+                Statystyki
             </Typography>
             <Grid container spacing={3}>
                 <Grid item xs={12}>
                     <Paper elevation={3} sx={{ p: 2 }}>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                             <Typography variant="h6" component="h2">
-                                Volume History
+                                Historia objętości
                             </Typography>
                             <FormControl sx={{ m: 1, minWidth: 200 }} size="small">
-                                <InputLabel id="exercise-select-label">Select Exercise</InputLabel>
+                                <InputLabel id="exercise-select-label">Wybierz ćwiczenie</InputLabel>
                                 <Select
                                     labelId="exercise-select-label"
                                     value={selectedExerciseId}
-                                    label="Select Exercise"
+                                    label="Wybierz ćwiczenie"
                                     onChange={handleExerciseChange}
                                 >
                                     {exercises.map((exercise) => (
@@ -100,7 +100,7 @@ const StatsPage: React.FC = () => {
                             <VolumeChart exerciseId={selectedExerciseId} sessions={sessions} />
                         ) : (
                             <Typography sx={{ mt: 2, textAlign: 'center' }}>
-                                {exercises.length > 0 ? 'Select an exercise to see the chart.' : 'No workout data available to display charts.'}
+                                {exercises.length > 0 ? 'Wybierz ćwiczenie, aby zobaczyć wykres.' : 'Brak danych treningowych do wyświetlenia wykresów.'}
                             </Typography>
                         )}
                     </Paper>
@@ -108,13 +108,13 @@ const StatsPage: React.FC = () => {
                 <Grid item xs={12}>
                     <Paper elevation={3} sx={{ p: 2 }}>
                         <Typography variant="h6" component="h2" sx={{ mb: 2 }}>
-                            Total Volume by Muscle Group
+                            Całkowita objętość wg grup mięśniowych
                         </Typography>
                         {sessions.length > 0 ? (
                             <MuscleGroupPieChart sessions={sessions} />
                         ) : (
                             <Typography sx={{ mt: 2, textAlign: 'center' }}>
-                                No workout data available to display chart.
+                                Brak danych treningowych do wyświetlenia wykresu.
                             </Typography>
                         )}
                     </Paper>

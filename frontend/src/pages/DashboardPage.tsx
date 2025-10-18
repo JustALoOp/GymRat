@@ -73,7 +73,7 @@ const DashboardPage: React.FC = () => {
                 const allSessions = await getWorkoutSessions();
                 setSessions(allSessions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
             } catch (err) {
-                setError('Failed to fetch dashboard data.');
+                setError('Nie udało się wczytać danych panelu.');
             } finally {
                 setLoading(false);
             }
@@ -94,26 +94,26 @@ const DashboardPage: React.FC = () => {
         return (
             <Box sx={{ textAlign: 'center', mt: 8 }}>
                 <Typography variant="h4" component="h1" gutterBottom>
-                    Welcome to GymRat, {user?.name.split(' ')[0] || 'User'}!
+                    Witaj w GymRat, {user?.name.split(' ')[0] || 'Użytkowniku'}!
                 </Typography>
                 <Typography variant="h6" color="text.secondary" sx={{ mb: 4 }}>
-                    It looks like you're new here. Let's get you started.
+                    Wygląda na to, że jesteś tu nowy. Zacznijmy.
                 </Typography>
                 <Grid container spacing={4} justifyContent="center">
                     <Grid item xs={12} md={5}>
                         <Paper variant="outlined" sx={{ p: 4, '&:hover': { boxShadow: 3 } }}>
                             <AddCircleOutlineIcon sx={{ fontSize: 50, color: 'primary.main', mb: 2 }}/>
-                            <Typography variant="h5" gutterBottom>Create a Workout Plan</Typography>
-                            <Typography sx={{ mb: 2 }}>Design your own routine by selecting exercises and setting your goals.</Typography>
-                            <Button variant="contained" component={Link} to="/workout-plans?action=new">Create Plan</Button>
+                            <Typography variant="h5" gutterBottom>Stwórz plan treningowy</Typography>
+                            <Typography sx={{ mb: 2 }}>Zaprojektuj własny program, wybierając ćwiczenia i określając cele.</Typography>
+                            <Button variant="contained" component={Link} to="/workout-plans?action=new">Stwórz plan</Button>
                         </Paper>
                     </Grid>
                     <Grid item xs={12} md={5}>
                         <Paper variant="outlined" sx={{ p: 4, '&:hover': { boxShadow: 3 } }}>
                             <DirectionsRunIcon sx={{ fontSize: 50, color: 'secondary.main', mb: 2 }}/>
-                            <Typography variant="h5" gutterBottom>Start Your First Workout</Typography>
-                            <Typography sx={{ mb: 2 }}>Jump right in and start tracking your first training session.</Typography>
-                            <Button variant="contained" color="secondary" component={Link} to="/workouts/active">Start Session</Button>
+                            <Typography variant="h5" gutterBottom>Rozpocznij pierwszy trening</Typography>
+                            <Typography sx={{ mb: 2 }}>Zacznij od razu i zapisz swoją pierwszą sesję treningową.</Typography>
+                            <Button variant="contained" color="secondary" component={Link} to="/workouts/active">Rozpocznij sesję</Button>
                         </Paper>
                     </Grid>
                 </Grid>
@@ -124,7 +124,7 @@ const DashboardPage: React.FC = () => {
     return (
         <Box>
             <Typography variant="h4" component="h1" gutterBottom sx={{ mb: 4 }}>
-                Welcome Back, {user?.name.split(' ')[0] || 'User'}!
+                Witaj ponownie, {user?.name.split(' ')[0] || 'Użytkowniku'}!
             </Typography>
             <Grid container spacing={3}>
                 {lastSession?.workoutPlan && (
@@ -148,8 +148,8 @@ const DashboardPage: React.FC = () => {
                             }}
                         >
                             <Box>
-                                <Typography variant="h5" component="h2" sx={{ fontWeight: 'bold' }}>Continue Your Journey</Typography>
-                                <Typography sx={{ opacity: 0.8 }}>Your last session was: <strong>{lastSession.workoutPlan.name}</strong></Typography>
+                                <Typography variant="h5" component="h2" sx={{ fontWeight: 'bold' }}>Kontynuuj swoją podróż</Typography>
+                                <Typography sx={{ opacity: 0.8 }}>Twoja ostatnia sesja to: <strong>{lastSession.workoutPlan.name}</strong></Typography>
                             </Box>
                             <Button
                                 variant="contained"
@@ -162,33 +162,33 @@ const DashboardPage: React.FC = () => {
                                 to={`/workouts/active/${lastSession.workoutPlan._id}`}
                                 endIcon={<ArrowForwardIcon />}
                             >
-                                Start Again
+                                Zacznij ponownie
                             </Button>
                         </Card>
                     </Grid>
                 )}
 
-                <Grid item xs={12} sm={4}><StatCard title="Total Workouts" value={totalWorkouts} icon={<FitnessCenterIcon />} /></Grid>
-                <Grid item xs={12} sm={4}><StatCard title="Total Volume (kg)" value={totalVolume.toLocaleString()} icon={<TrendingUpIcon />} /></Grid>
-                <Grid item xs={12} sm={4}><StatCard title="Last Workout Date" value={lastSession ? new Date(lastSession.date).toLocaleDateString() : 'N/A'} icon={<CalendarTodayIcon />} /></Grid>
+                <Grid item xs={12} sm={4}><StatCard title="Liczba treningów" value={totalWorkouts} icon={<FitnessCenterIcon />} /></Grid>
+                <Grid item xs={12} sm={4}><StatCard title="Całkowita objętość (kg)" value={totalVolume.toLocaleString()} icon={<TrendingUpIcon />} /></Grid>
+                <Grid item xs={12} sm={4}><StatCard title="Data ostatniego treningu" value={lastSession ? new Date(lastSession.date).toLocaleDateString() : 'Brak'} icon={<CalendarTodayIcon />} /></Grid>
 
                 {lastSession && (
                      <Grid item xs={12}>
                         <Card>
                             <CardContent>
-                                <Typography variant="h6" gutterBottom>Last Workout Summary: {lastSession.workoutPlan?.name || 'Session'}</Typography>
+                                <Typography variant="h6" gutterBottom>Podsumowanie ostatniego treningu: {lastSession.workoutPlan?.name || 'Sesja'}</Typography>
                                 <Grid container spacing={2}>
                                     {lastSession.performedExercises.slice(0, 3).map(pEx => (
                                         <Grid item xs={12} md={4} key={pEx.exercise._id}>
                                             <Paper variant="outlined" sx={{ p: 2, textAlign: 'center', height: '100%' }}>
                                                 <Typography variant="subtitle1" component="div" sx={{fontWeight: 'bold'}}>{pEx.exercise.name}</Typography>
-                                                <Typography color="text.secondary">{pEx.sets.length} sets</Typography>
+                                                <Typography color="text.secondary">{pEx.sets.length} serie</Typography>
                                             </Paper>
                                         </Grid>
                                     ))}
                                 </Grid>
                                 <Box sx={{textAlign: 'right', mt: 2}}>
-                                    <Button component={Link} to={`/workouts/${lastSession._id}`} size="small">View Full Details</Button>
+                                    <Button component={Link} to={`/workouts/${lastSession._id}`} size="small">Zobacz pełne szczegóły</Button>
                                 </Box>
                             </CardContent>
                         </Card>

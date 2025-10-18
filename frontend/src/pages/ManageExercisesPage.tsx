@@ -39,7 +39,7 @@ const ManageExercisesPage: React.FC = () => {
             setExercises(data);
             setError(null);
         } catch (err) {
-            setError('Nie udało się pobrać ćwiczeń.');
+            setError('Nie udało się wczytać ćwiczeń.');
             console.error(err);
         } finally {
             setLoading(false);
