@@ -15,9 +15,17 @@ import {
     MenuItem,
     FormControl,
     InputLabel,
-    SelectChangeEvent
+    SelectChangeEvent,
+    IconButton,
+    Stack,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions
 } from '@mui/material';
-import { getExercises, createExercise } from '../api/exercises';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { getExercises, createExercise, updateExercise, deleteExercise } from '../api/exercises';
 import { Exercise } from '../types/exercise';
 
 const ManageExercisesPage: React.FC = () => {
@@ -27,6 +35,8 @@ const ManageExercisesPage: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
+    const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+    const [currentExercise, setCurrentExercise] = useState<Exercise | null>(null);
 
     useEffect(() => {
         fetchExercises();
@@ -69,6 +79,44 @@ const ManageExercisesPage: React.FC = () => {
 
     const handleTypeChange = (event: SelectChangeEvent<'weight' | 'cardio'>) => {
         setNewExerciseType(event.target.value as 'weight' | 'cardio');
+    };
+
+    const handleEditClick = (exercise: Exercise) => {
+        setCurrentExercise(exercise);
+        setIsEditDialogOpen(true);
+    };
+
+    const handleEditClose = () => {
+        setIsEditDialogOpen(false);
+        setCurrentExercise(null);
+    };
+
+    const handleUpdateExercise = async () => {
+        if (!currentExercise) return;
+
+        try {
+            const updated = await updateExercise(currentExercise._id, {
+                name: currentExercise.name,
+                type: currentExercise.type,
+            });
+            setExercises(exercises.map((ex) => (ex._id === updated._id ? updated : ex)));
+            handleEditClose();
+            setSuccess('Pomyślnie zaktualizowano ćwiczenie!');
+        } catch (err) {
+            setError('Nie udało się zaktualizować ćwiczenia.');
+        }
+    };
+
+    const handleDeleteExercise = async (id: string) => {
+        if (window.confirm('Czy na pewno chcesz usunąć to ćwiczenie?')) {
+            try {
+                await deleteExercise(id);
+                setExercises(exercises.filter((ex) => ex._id !== id));
+                setSuccess('Pomyślnie usunięto ćwiczenie!');
+            } catch (err) {
+                setError('Nie udało się usunąć ćwiczenia.');
+            }
+        }
     };
 
     return (
@@ -119,7 +167,20 @@ const ManageExercisesPage: React.FC = () => {
                 ) : (
                     <List>
                         {exercises.map((exercise) => (
-                            <ListItem key={exercise._id} divider>
+                            <ListItem
+                                key={exercise._id}
+                                divider
+                                secondaryAction={
+                                    <Stack direction="row" spacing={1}>
+                                        <IconButton edge="end" aria-label="edit" onClick={() => handleEditClick(exercise)}>
+                                            <EditIcon />
+                                        </IconButton>
+                                        <IconButton edge="end" aria-label="delete" onClick={() => handleDeleteExercise(exercise._id)}>
+                                            <DeleteIcon />
+                                        </IconButton>
+                                    </Stack>
+                                }
+                            >
                                 <ListItemText
                                     primary={exercise.name}
                                     secondary={exercise.type === 'weight' ? 'Siłowe' : 'Cardio'}
@@ -127,6 +188,40 @@ const ManageExercisesPage: React.FC = () => {
                             </ListItem>
                         ))}
                     </List>
+                )}
+
+                {currentExercise && (
+                    <Dialog open={isEditDialogOpen} onClose={handleEditClose} fullWidth maxWidth="sm">
+                        <DialogTitle>Edytuj Ćwiczenie</DialogTitle>
+                        <DialogContent>
+                            <TextField
+                                autoFocus
+                                margin="dense"
+                                label="Nazwa Ćwiczenia"
+                                type="text"
+                                fullWidth
+                                variant="outlined"
+                                value={currentExercise.name}
+                                onChange={(e) => setCurrentExercise({ ...currentExercise, name: e.target.value })}
+                                sx={{ mt: 2 }}
+                            />
+                            <FormControl fullWidth sx={{ mt: 2 }}>
+                                <InputLabel>Typ Ćwiczenia</InputLabel>
+                                <Select
+                                    value={currentExercise.type}
+                                    label="Typ Ćwiczenia"
+                                    onChange={(e) => setCurrentExercise({ ...currentExercise, type: e.target.value as 'weight' | 'cardio' })}
+                                >
+                                    <MenuItem value="weight">Siłowe (Ciężar i Powtórzenia)</MenuItem>
+                                    <MenuItem value="cardio">Cardio (Dystans i Czas)</MenuItem>
+                                </Select>
+                            </FormControl>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={handleEditClose}>Anuluj</Button>
+                            <Button onClick={handleUpdateExercise} variant="contained">Zapisz</Button>
+                        </DialogActions>
+                    </Dialog>
                 )}
             </Paper>
         </Container>
