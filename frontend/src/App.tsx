@@ -7,6 +7,7 @@ import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
 import WorkoutsPage from './pages/WorkoutsPage';
 import WorkoutPlansPage from './pages/WorkoutPlansPage';
+import WorkoutDetailsPage from './pages/WorkoutDetailsPage';
 import WorkoutPlanDetailsPage from './pages/WorkoutPlanDetailsPage';
 import ActiveWorkoutPage from './pages/ActiveWorkoutPage';
 import StatsPage from './pages/StatsPage';
@@ -39,6 +40,16 @@ function App() {
                             <ProtectedRoute>
                                 <Layout>
                                     <WorkoutsPage />
+                                </Layout>
+                            </ProtectedRoute>
+                        }
+                    />
+                     <Route
+                        path="/workouts/:id"
+                        element={
+                            <ProtectedRoute>
+                                <Layout>
+                                    <WorkoutDetailsPage />
                                 </Layout>
                             </ProtectedRoute>
                         }
