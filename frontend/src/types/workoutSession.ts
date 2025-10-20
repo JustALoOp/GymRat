@@ -7,7 +7,7 @@ interface PerformedSet {
     completed: boolean;
 }
 
-interface PerformedExercise {
+export interface PerformedExercise {
     exercise: Exercise;
     sets: PerformedSet[];
 }
