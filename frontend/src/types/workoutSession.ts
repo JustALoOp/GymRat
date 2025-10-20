@@ -1,7 +1,7 @@
 import type { Exercise } from './exercise';
 import type { IWorkoutPlan } from './workoutPlan';
 
-interface PerformedSet {
+export interface PerformedSet {
     weight: number;
     reps: number;
     completed: boolean;
