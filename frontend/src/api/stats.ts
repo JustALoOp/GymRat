@@ -18,12 +18,3 @@ export const getUniqueExercises = async () => {
     const response = await apiClient.get('/stats/unique-exercises');
     return response.data.data;
 };
-
-/**
- * Fetches overall workout statistics for the user.
- * @returns An object containing total sessions, total volume, and weekly volume data.
- */
-export const getOverallStats = async () => {
-    const response = await apiClient.get('/stats/overall');
-    return response.data.data;
-};
